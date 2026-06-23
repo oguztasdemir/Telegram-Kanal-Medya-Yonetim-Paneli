@@ -1,0 +1,3271 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Sınav Sorusu ve Medya İndirme Paneli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Base Theme (Dark - Default) */
+            --bg-color: #030712;
+            --sidebar-color: #0b0f19;
+            --card-color: #111827;
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --glass-bg: rgba(17, 24, 39, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --glow-color: rgba(79, 70, 229, 0.15);
+            --font-main: 'Outfit', sans-serif;
+            --sidebar-width: 340px;
+            
+            /* Personalization overrides defaults */
+            --base-font-size: 14px;
+            --row-padding: 10px 16px;
+        }
+
+        /* Light Theme */
+        body.theme-light {
+            --bg-color: #f8fafc;
+            --sidebar-color: #ffffff;
+            --card-color: #f1f5f9;
+            --primary-color: #4f46e5;
+            --primary-hover: #3730a3;
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --glow-color: rgba(79, 70, 229, 0.08);
+        }
+
+        /* Cyberpunk Theme */
+        body.theme-cyberpunk {
+            --bg-color: #0c0014;
+            --sidebar-color: #1a002c;
+            --card-color: #24003e;
+            --primary-color: #ff007f;
+            --primary-hover: #e60072;
+            --text-color: #00ffff;
+            --text-muted: #bd93f9;
+            --accent-green: #39ff14;
+            --accent-yellow: #ffff00;
+            --accent-red: #ff003c;
+            --border-color: rgba(255, 0, 127, 0.3);
+            --glass-bg: rgba(26, 0, 44, 0.7);
+            --glass-border: rgba(255, 0, 127, 0.2);
+            --glow-color: rgba(255, 0, 127, 0.3);
+        }
+
+        /* Forest Theme */
+        body.theme-forest {
+            --bg-color: #0b120c;
+            --sidebar-color: #111a12;
+            --card-color: #1b291d;
+            --primary-color: #10b981;
+            --primary-hover: #059669;
+            --text-color: #ecfdf5;
+            --text-muted: #a7f3d0;
+            --border-color: rgba(16, 185, 129, 0.15);
+            --glass-bg: rgba(17, 26, 18, 0.7);
+            --glass-border: rgba(16, 185, 129, 0.1);
+            --glow-color: rgba(16, 185, 129, 0.15);
+        }
+
+        /* Ocean Theme */
+        body.theme-ocean {
+            --bg-color: #020e1a;
+            --sidebar-color: #05192e;
+            --card-color: #082645;
+            --primary-color: #0ea5e9;
+            --primary-hover: #0284c7;
+            --text-color: #f0f9ff;
+            --text-muted: #bae6fd;
+            --border-color: rgba(14, 165, 233, 0.18);
+            --glass-bg: rgba(5, 25, 46, 0.7);
+            --glass-border: rgba(14, 165, 233, 0.1);
+            --glow-color: rgba(14, 165, 233, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-main);
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 0%, var(--glow-color), transparent 50%), var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+            font-size: var(--base-font-size);
+        }
+
+        /* Sidebar styling */
+        aside {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-color);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            flex-shrink: 0;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+        }
+
+        .logo-area {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a5b4fc, #6366f1, #4f46e5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            outline: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+            font-size: calc(var(--base-font-size) * 0.95);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: var(--card-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+            border-color: var(--text-muted);
+            transform: translateY(-1px);
+        }
+
+        .search-box {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            width: 100%;
+            outline: none;
+            font-size: calc(var(--base-font-size) * 0.95);
+            transition: all 0.2s ease;
+        }
+
+        .search-box:focus {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 3px var(--glow-color);
+        }
+
+        .scroll-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+        }
+
+        .channel-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--row-padding);
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: all 0.25s ease;
+            width: 100%;
+            position: relative;
+        }
+
+        .channel-row:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .channel-row.active {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(99, 102, 241, 0.05));
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+        }
+
+        .channel-name {
+            flex-grow: 1;
+            cursor: pointer;
+            font-size: calc(var(--base-font-size) * 0.95);
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--text-color);
+            text-align: left;
+            padding-right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .channel-name svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            color: var(--text-muted);
+        }
+
+        .channel-row.active .channel-name svg {
+            color: var(--primary-color);
+        }
+
+        .channel-actions {
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .channel-row:hover .channel-actions {
+            opacity: 1;
+        }
+
+        .action-icon-btn {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .action-icon-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .action-icon-btn:hover {
+            color: var(--text-color);
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--text-muted);
+        }
+
+        .action-icon-btn.destruct:hover {
+            background-color: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        /* Main Content */
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+
+        .header-bar input {
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .header-bar button {
+            align-self: stretch;
+            height: auto;
+        }
+
+        /* Tabs styling */
+        .tab-bar {
+            display: flex;
+            gap: 6px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 6px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            align-self: flex-start;
+        }
+
+        .tab-btn {
+            background-color: transparent;
+            color: var(--text-muted);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: calc(var(--base-font-size) * 0.95);
+        }
+
+        .tab-btn:hover {
+            color: var(--text-color);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .sub-filters {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            padding: 12px 20px;
+            border-radius: 16px;
+        }
+
+        .sub-filters span {
+            font-weight: 600;
+            font-size: calc(var(--base-font-size) * 0.85);
+            color: var(--text-muted);
+        }
+
+        .sub-btn-group {
+            display: flex;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .sub-btn {
+            background-color: transparent;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: calc(var(--base-font-size) * 0.85);
+            font-weight: 600;
+        }
+
+        .sub-btn:hover {
+            color: var(--text-color);
+        }
+
+        .sub-btn.active {
+            background-color: var(--card-color);
+            color: var(--text-color);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        /* Content list */
+        .content-area {
+            flex-grow: 1;
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 18px;
+            border: 1px solid var(--glass-border);
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: inset 0 0 12px rgba(255,255,255,0.01);
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 1fr 100px 140px 240px;
+            padding: var(--row-padding);
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 700;
+            font-size: calc(var(--base-font-size) * 0.85);
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .media-row {
+            display: grid;
+            grid-template-columns: 1fr 100px 140px 240px;
+            align-items: center;
+            padding: var(--row-padding);
+            background-color: transparent;
+            border-bottom: 1px solid var(--border-color);
+            font-size: calc(var(--base-font-size) * 0.95);
+            transition: all 0.2s ease;
+            animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .media-row:hover {
+            background-color: rgba(255, 255, 255, 0.04);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .file-name {
+            font-weight: 600;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            padding-right: 15px;
+            color: var(--text-color);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .action-btns button, .action-btns .btn {
+            padding: 6px 12px !important;
+            font-size: calc(var(--base-font-size) * 0.85) !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            white-space: nowrap !important;
+            width: auto !important;
+            height: 32px !important;
+            box-shadow: none !important;
+            transform: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+        }
+
+        .btn-preview {
+            background-color: rgba(255, 255, 255, 0.06);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-preview:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+            border-color: var(--text-muted);
+        }
+
+        .btn-small {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: calc(var(--base-font-size) * 0.85);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-small:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--text-muted);
+        }
+
+        /* Chat bubbles */
+        .chat-bubble {
+            max-width: 80%;
+            padding: 16px 20px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            font-size: calc(var(--base-font-size) * 0.95);
+            line-height: 1.6;
+            position: relative;
+            word-break: break-word;
+            animation: fadeIn 0.25s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-left {
+            align-self: flex-start;
+            background-color: rgba(255, 255, 255, 0.02);
+            color: var(--text-color);
+            border-top-left-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chat-sender {
+            font-size: calc(var(--base-font-size) * 0.85);
+            font-weight: 700;
+            color: #818cf8;
+            margin-bottom: 6px;
+        }
+
+        .chat-time {
+            font-size: calc(var(--base-font-size) * 0.8);
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .chat-media-card {
+            background-color: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            min-width: 320px;
+        }
+
+        .chat-link-card {
+            background-color: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 10px;
+        }
+
+        .chat-link-card a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 600;
+            word-break: break-all;
+            transition: color 0.2s ease;
+        }
+
+        .chat-link-card a:hover {
+            color: #a5b4fc;
+            text-decoration: underline;
+        }
+
+        .load-more-btn {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 14px;
+            text-align: center;
+            border-radius: 12px;
+            font-weight: 600;
+            margin: 16px 0;
+            width: 100%;
+        }
+        .load-more-btn:hover {
+            background-color: var(--border-color);
+            transform: translateY(-1px);
+        }
+
+        .badge-tag {
+            display: inline-flex;
+            align-items: center;
+            font-size: calc(var(--base-font-size) * 0.78);
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-right: 4px;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            vertical-align: middle;
+            text-transform: uppercase;
+        }
+        
+        .badge-pdf { background-color: rgba(239, 68, 68, 0.1) !important; color: #f87171 !important; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .badge-saglik { background-color: rgba(16, 185, 129, 0.1) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge-fen { background-color: rgba(59, 130, 246, 0.1) !important; color: #60a5fa !important; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .badge-sosyal { background-color: rgba(245, 158, 11, 0.1) !important; color: #fbbf24 !important; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .badge-yokdil { background-color: rgba(139, 92, 246, 0.15) !important; color: #c084fc !important; border: 1px solid rgba(139, 92, 246, 0.25); }
+        .badge-yds { background-color: rgba(6, 182, 212, 0.15) !important; color: #22d3ee !important; border: 1px solid rgba(6, 182, 212, 0.25); }
+        
+        /* Floating Action Bar */
+        .floating-batch-bar {
+            position: fixed;
+            bottom: 48px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--sidebar-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 16px;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            z-index: 95;
+            min-width: 600px;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translate(-50%, 40px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        /* Queue item styles */
+        .queue-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: calc(var(--base-font-size) * 0.9);
+            gap: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .queue-item:hover {
+            background-color: rgba(255, 255, 255, 0.04);
+            border-color: var(--text-muted);
+        }
+        
+        .queue-item-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            text-align: left;
+        }
+        
+        .queue-item-name {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-color);
+        }
+        
+        .queue-item-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: calc(var(--base-font-size) * 0.78);
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        
+        .queue-item-progress-container {
+            width: 120px;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 3px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--border-color);
+        }
+        
+        .queue-item-progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .queue-item-status-badge {
+            font-size: calc(var(--base-font-size) * 0.7);
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            text-align: center;
+            min-width: 90px;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-waiting { background-color: rgba(245, 158, 11, 0.1); color: var(--accent-yellow); border: 1px solid rgba(245, 158, 11, 0.25); }
+        .badge-downloading { background-color: rgba(79, 70, 229, 0.1); color: #818cf8; border: 1px solid rgba(79, 70, 229, 0.25); }
+        .badge-completed { background-color: rgba(16, 185, 129, 0.1); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.25); }
+        .badge-failed { background-color: rgba(239, 68, 68, 0.1); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.25); }
+        .badge-cancelled { background-color: rgba(156, 163, 175, 0.1); color: var(--text-muted); border: 1px solid rgba(156, 163, 175, 0.25); }
+
+        /* Right Panel */
+        .right-panel {
+            width: 320px;
+            background-color: var(--sidebar-color);
+            border-left: 1px solid var(--border-color);
+            display: none;
+            flex-direction: column;
+            padding: 24px;
+            flex-shrink: 0;
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        .shared-media-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.01);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .shared-media-row:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: var(--primary-color);
+            transform: translateX(2px);
+        }
+        
+        .channel-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        /* Modals */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(3, 7, 18, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background-color: var(--sidebar-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+            width: 440px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: modalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes modalScale {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .modal-content input, .modal-content select {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 16px;
+            border-radius: 12px;
+            outline: none;
+            width: 100%;
+            font-size: calc(var(--base-font-size) * 0.95);
+            transition: all 0.2s ease;
+        }
+
+        .modal-content input:focus, .modal-content select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--glow-color);
+        }
+
+        /* PDF and Audio Preview helpers */
+        .pdf-search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .pdf-search-box input {
+            flex-grow: 1;
+            background-color: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px 14px;
+            border-radius: 10px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .pdf-search-results {
+            background-color: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            max-height: 180px;
+            overflow-y: auto;
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .pdf-match-row {
+            padding: 10px;
+            background-color: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .pdf-match-row:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .audio-speed-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            justify-content: center;
+        }
+
+        .speed-btn {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .speed-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-color), #818cf8);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* Status bar footer */
+        footer {
+            height: 32px;
+            background-color: var(--sidebar-color);
+            border-top: 1px solid var(--border-color);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 12px;
+            z-index: 10;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-red);
+            margin-right: 10px;
+            box-shadow: 0 0 8px var(--accent-red);
+            transition: all 0.3s ease;
+        }
+
+        /* Account Quick Login Card */
+        .account-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
+        }
+        .account-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary-color);
+        }
+        .account-card.active {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.05);
+        }
+        .account-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        .account-phone {
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 13px;
+        }
+        .account-api {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .account-delete-btn {
+            background: transparent;
+            color: var(--accent-red);
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .account-delete-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Left Sidebar -->
+    <aside>
+        <div class="logo-area">
+            <span>TELEGRAM PANEL</span>
+            <div style="display: flex; gap: 8px;">
+                <button class="action-icon-btn" onclick="openSettingsModal()" title="Ayarlar & Oturumlar">⚙️</button>
+            </div>
+        </div>
+        <button class="btn" onclick="goToHome()" style="margin-bottom: 8px; background: linear-gradient(to right, #4f46e5, #6366f1); border: none;">🏠 Ana Sayfa / Reset</button>
+        <button class="btn btn-secondary" onclick="refreshChannels()">Sohbetleri Yenile</button>
+        <input type="text" class="search-box" id="sidebarSearch" placeholder="Kanal/Grup ara..." oninput="filterChannels()">
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 13px;">
+            <input type="checkbox" id="showArchivedCheck" onchange="refreshChannels()" style="width: auto; margin: 0; cursor: pointer;">
+            <label for="showArchivedCheck" style="cursor: pointer; font-weight: 600; color: var(--text-muted);">Arşivleri Göster</label>
+        </div>
+        
+        <div class="scroll-list" id="channelList">
+            <div style="padding: 20px; text-align: center; color: var(--text-muted);">Yükleniyor...</div>
+        </div>
+
+        <button class="btn btn-secondary" onclick="openModal('downloadsModal')" style="margin-bottom: 8px;">📥 İndirme Yöneticisi <span id="sidebarQueueSummaryBadge" style="background-color: var(--primary-color); color: white; font-size: 11px; padding: 2px 6px; border-radius: 10px; font-weight: 600; margin-left: 5px; display: none;"></span></button>
+        <button class="btn btn-secondary" onclick="openSettingsModal()">Ayarlar & Oturum</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+        <div class="header-bar">
+            <input type="text" class="search-box" id="mainSearch" placeholder="Belge veya metin ara..." oninput="filterMediaList()">
+            <button class="btn btn-secondary" onclick="filterMediaList()" style="width: auto;">Ara</button>
+            <button class="btn" onclick="triggerGlobalSearch()" style="width: auto; background: linear-gradient(to right, #4f46e5, #818cf8); border: none;">🔍 Tüm Sohbetlerde Ara</button>
+            <button class="btn btn-secondary" onclick="toggleFullscreen()" style="width: auto;" title="Tam Ekran (Alt + Enter)" id="fullscreenBtn">📺 Tam Ekran</button>
+        </div>
+
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab(this, 'all')">Sohbet Akışı</button>
+            <button class="tab-btn" onclick="switchTab(this, 'document')">Belgeler / Dokümanlar</button>
+            <button class="tab-btn" onclick="switchTab(this, 'photo')">Görseller / Fotoğraflar</button>
+            <button class="tab-btn" onclick="switchTab(this, 'audio')">Ses / Ses Kayıtları</button>
+            <button class="tab-btn" onclick="switchTab(this, 'link')">Bağlantılar / Linkler</button>
+        </div>
+
+        <div class="sub-filters">
+            <div id="subFilterContainer" style="display: none; align-items: center; gap: 15px;">
+                <span>Uzantı Filtresi:</span>
+                <div class="sub-btn-group" id="subFiltersGroup">
+                    <button class="sub-btn active" onclick="switchSubFilter(this, 'Tümü')">Tümü</button>
+                    <button class="sub-btn" onclick="switchSubFilter(this, 'PDF')">PDF</button>
+                    <button class="sub-btn" onclick="switchSubFilter(this, 'DOC/DOCX')">DOC/DOCX</button>
+                    <button class="sub-btn" onclick="switchSubFilter(this, 'Diğer')">Diğer</button>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-left: 15px; flex-wrap: wrap;">
+                <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Etiket Filtreleri:</span>
+                <input type="text" id="tagSearchInput" placeholder="Etiketlerde ara..." oninput="filterTagButtons(this.value)" style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); color: var(--text-color); padding: 4px 10px; border-radius: 8px; outline: none; font-size: 11px; font-weight: 600; width: 130px; display: none; transition: all 0.2s ease;">
+                <div class="sub-btn-group" id="tagFiltersGroup">
+                    <span style="font-size: 12px; color: var(--text-muted); padding: 6px 12px;">Sohbet seçilince yüklenecek...</span>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Content list -->
+        <div class="content-area" id="mediaList">
+            <div style="padding: 60px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 20px;">
+                <h1 style="font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #a5b4fc, #6366f1, #4f46e5); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Hoş Geldiniz! 👋</h1>
+                <p style="color: var(--text-muted); font-size: 16px; max-width: 500px; line-height: 1.6;">Telegram Sınav Sorusu ve Medya İndirme Paneline hoş geldiniz. Başlamak veya herhangi bir sorun durumunda paneli sıfırlamak için sol taraftaki sohbet listesinden bir kanal seçebilirsiniz.</p>
+                <div style="margin-top: 10px; padding: 16px 24px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 12px; font-size: 13px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 8px;">
+                    <span class="status-dot" style="background-color: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); position: relative; display: inline-block; margin: 0;"></span>
+                    Sistem Durumu: <span style="color: var(--accent-green); font-weight: 600;">Aktif ve Hazır</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Batch Action Bar -->
+        <div id="floatingBatchBar" class="floating-batch-bar" style="display: none;">
+            <span id="floatingBatchText" style="font-weight: 600; font-size: 14px;">0 dosya seçildi</span>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <span style="font-size: 12px; color: var(--text-muted);">Hedef:</span>
+                <select id="batchFolderSelect" style="background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); padding: 5px; border-radius: 6px; outline: none; font-size: 12px; font-weight: 600; cursor: pointer;">
+                </select>
+                <button class="btn btn-secondary" onclick="clearAllSelection()" style="width: auto; padding: 5px 12px; font-size: 12px;">Temizle</button>
+                <button class="btn" onclick="triggerBatchDownloadDirectly()" style="width: auto; padding: 5px 15px; font-size: 12px; background: linear-gradient(to right, #3b82f6, #10b981); border: none;">Hızlı İndir</button>
+                <button class="btn" onclick="triggerSelectedBatchDownload()" style="width: auto; padding: 5px 15px; font-size: 12px; background: linear-gradient(to right, #4f46e5, #0ea5e9); border: none;">Özel Konuma İndir</button>
+                <button class="btn" onclick="triggerBatchZipDownloadDirectly()" style="width: auto; padding: 5px 15px; font-size: 12px; background: linear-gradient(to right, #8b5cf6, #ec4899); border: none;">ZIP Olarak İndir</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Right Panel (Channel Info) -->
+    <div id="channelInfoPanel" class="right-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--text-color);">Sohbet Bilgisi</h3>
+            <button class="action-icon-btn" onclick="closeRightPanel()" title="Kapat">✕</button>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; margin-bottom: 24px;">
+            <div id="rightPanelAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #818cf8); display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; font-weight: 700; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
+                TP
+            </div>
+            <h2 id="rightPanelName" style="font-size: 18px; font-weight: 700; color: var(--text-color); word-break: break-word;">Kanal Adı</h2>
+            <span id="rightPanelType" style="font-size: 12px; font-weight: 600; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 20px;">Kanal</span>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 8px; margin-bottom: 24px; width: 100%;">
+            <button id="rightPanelMuteBtn" class="btn btn-secondary" style="font-size: 13px; padding: 10px; flex: 1;" onclick="toggleRightPanelMute()">
+                🔇 Sessiz
+            </button>
+            <button id="rightPanelLeaveBtn" class="btn btn-secondary" style="font-size: 13px; padding: 10px; flex: 1; color: var(--accent-red); border-color: rgba(239,68,68,0.2);" onclick="toggleRightPanelLeave()">
+                🚪 Ayrıl
+            </button>
+        </div>
+        
+        <div style="border-top: 1px solid var(--border-color); padding-top: 20px;">
+            <h4 style="font-size: 14px; font-weight: 700; color: var(--text-color); margin-bottom: 12px;">Paylaşılan Medya</h4>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="shared-media-row" onclick="switchTab(document.querySelector('.tab-btn[onclick*=\'document\']'), 'document')">
+                    <span style="font-size: 16px;">📄</span>
+                    <span style="flex-grow: 1; text-align: left; font-size: 13px; font-weight: 600;">Belgeler</span>
+                    <span id="rightPanelDocCount" style="font-size: 12px; color: var(--text-muted); font-weight: 600;">0</span>
+                </div>
+                <div class="shared-media-row" onclick="switchTab(document.querySelector('.tab-btn[onclick*=\'photo\']'), 'photo')">
+                    <span style="font-size: 16px;">🖼️</span>
+                    <span style="flex-grow: 1; text-align: left; font-size: 13px; font-weight: 600;">Görseller</span>
+                    <span id="rightPanelPhotoCount" style="font-size: 12px; color: var(--text-muted); font-weight: 600;">0</span>
+                </div>
+                <div class="shared-media-row" onclick="switchTab(document.querySelector('.tab-btn[onclick*=\'audio\']'), 'audio')">
+                    <span style="font-size: 16px;">🎵</span>
+                    <span style="flex-grow: 1; text-align: left; font-size: 13px; font-weight: 600;">Ses Dosyaları</span>
+                    <span id="rightPanelAudioCount" style="font-size: 12px; color: var(--text-muted); font-weight: 600;">0</span>
+                </div>
+                <div class="shared-media-row" onclick="switchTab(document.querySelector('.tab-btn[onclick*=\'link\']'), 'link')">
+                    <span style="font-size: 16px;">🔗</span>
+                    <span style="flex-grow: 1; text-align: left; font-size: 13px; font-weight: 600;">Bağlantılar</span>
+                    <span id="rightPanelLinkCount" style="font-size: 12px; color: var(--text-muted); font-weight: 600;">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status footer -->
+    <footer>
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Bağlantı denetleniyor...</span>
+    </footer>
+
+    <!-- Downloads Modal -->
+    <div class="modal" id="downloadsModal">
+        <div class="modal-content" style="width: 600px; max-width: 95%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700;">📥 İndirme Yöneticisi</h3>
+                <button class="btn btn-secondary" onclick="closeModal('downloadsModal')" style="width: auto; padding: 5px 15px;">Kapat</button>
+            </div>
+            
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px;">
+                    <span id="progressDetail" style="color: var(--text-muted);">Aktif indirme işlemi yok.</span>
+                    <span id="progressPercent" style="font-weight: 600;">Boşta</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+            
+            <div id="downloadQueueList" style="max-height: 300px; overflow-y: auto; margin-top: 15px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                <div style="padding: 10px; text-align: center; color: var(--text-muted); font-size:12px;">Kuyrukta dosya yok.</div>
+            </div>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                <button class="btn btn-secondary" onclick="clearCompletedDownloads()" style="padding: 6px 12px; font-size: 12px; width: auto; font-weight: 600; cursor: pointer; color: var(--accent-red); border-color: rgba(239, 68, 68, 0.3);">🧹 Temizle</button>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span style="font-size: 12px; color: var(--text-muted);">Klasör Aç:</span>
+                    <select id="openFolderSelect" onchange="if(this.value) { openFolderOnServer(this.value); this.value=''; }" style="background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); padding: 5px 10px; border-radius: 8px; outline: none; font-size: 12px; font-weight: 600; cursor: pointer;">
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings & Personalization Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content" style="width: 500px; max-width: 95%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3>Ayarlar & Oturum Yönetimi</h3>
+                <button class="btn btn-secondary" onclick="closeSettingsModal()" style="width:auto; padding:5px 10px;">✕</button>
+            </div>
+            
+            <!-- Tab selector inside settings -->
+            <div style="display: flex; gap: 4px; background: rgba(0,0,0,0.15); padding: 4px; border-radius: 8px; margin-bottom: 15px;">
+                <button class="btn btn-secondary" id="settingsAccountsTabBtn" onclick="switchSettingsTab('accounts')" style="flex:1; padding:6px; font-size:12px; border:none;">👥 Oturumlar</button>
+                <button class="btn btn-secondary" id="settingsDisplayTabBtn" onclick="switchSettingsTab('display')" style="flex:1; padding:6px; font-size:12px; border:none;">🎨 Görünüm</button>
+                <button class="btn btn-secondary" id="settingsFoldersTabBtn" onclick="switchSettingsTab('folders')" style="flex:1; padding:6px; font-size:12px; border:none;">📁 Klasörler</button>
+            </div>
+
+            <!-- Accounts Settings Tab -->
+            <div id="settingsTabAccounts" style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- Saved Accounts Section -->
+                <div>
+                    <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin-bottom: 8px;">Kayıtlı Hesaplar (Hızlı Giriş)</h4>
+                    <div id="savedAccountsList" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column;">
+                        <!-- Render accounts list -->
+                    </div>
+                </div>
+
+                <!-- Add account form -->
+                <div style="border-top: 1px solid var(--border-color); padding-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+                    <h4 id="accountFormTitle" style="font-size: 13px; font-weight: 700; color: var(--text-color);">Yeni Hesap Ekle / Güncelle</h4>
+                    <input type="text" id="apiIdInput" placeholder="API ID">
+                    <input type="text" id="apiHashInput" placeholder="API Hash">
+                    <input type="text" id="phoneInput" placeholder="Telefon Numarası (+90...)">
+                    <button class="btn" onclick="saveSettings()">Bilgileri Kaydet ve Bağlan</button>
+                </div>
+
+                <!-- Guide to get Telegram API key -->
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; font-size: 12px; text-align: left; line-height: 1.4;">
+                    <strong style="color: var(--primary-color);">Telegram API Bilgileri (API ID, API Hash) Nasıl Alınır?</strong>
+                    <ol style="margin-left: 15px; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
+                        <li>İlk olarak <a href="https://my.telegram.org" target="_blank" style="color: var(--primary-color); text-decoration: underline; font-weight: 600;">my.telegram.org</a> web adresine gidin.</li>
+                        <li>Telegram telefon numaranızı uluslararası formatta (örn: <code>+905XXXXXXXXX</code>) yazarak giriş yapın.</li>
+                        <li>Telegram uygulamanıza gelen giriş kodunu web sayfasına yazın.</li>
+                        <li>Karşınıza çıkan menüden <strong>API development tools</strong> seçeneğine tıklayın.</li>
+                        <li>Yeni bir uygulama oluşturma formunda <strong>App title</strong> ve <strong>Short name</strong> alanlarını doldurun (örn: "MedyaPanel" yazabilirsiniz). Diğer alanları boş bırakabilirsiniz.</li>
+                        <li>Uygulamayı oluşturduktan sonra ekranda yazan <strong>App api_id</strong> (sayılardan oluşur) ve <strong>App api_hash</strong> değerlerini kopyalayarak yukarıdaki alanlara girin.</li>
+                    </ol>
+                    <div style="margin-top: 8px; text-align: center;">
+                        <a href="https://my.telegram.org" target="_blank" class="btn btn-secondary" style="display: inline-flex; width: auto; font-size: 11px; padding: 6px 12px !important; height: auto !important; border-color: var(--primary-color); color: var(--primary-color);">my.telegram.org Sitesine Git 🌐</a>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color); padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <button class="btn btn-secondary" onclick="logout()" style="color: var(--accent-red); border-color: rgba(239, 68, 68, 0.2); width: auto; font-size: 12px; padding: 8px 15px !important; height: auto !important;">Oturumu Kapat / Çıkış Yap</button>
+                </div>
+            </div>
+
+            <!-- Display settings tab -->
+            <div id="settingsTabDisplay" style="display: none; flex-direction: column; gap: 15px; text-align: left;">
+                <div>
+                    <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin-bottom: 8px;">Tema Seçimi</h4>
+                    <select id="themeSelectSetting" onchange="changeThemeCustom(this.value)">
+                        <option value="dark">Koyu Tema (Varsayılan)</option>
+                        <option value="light">Açık Tema</option>
+                        <option value="cyberpunk">Cyberpunk Neon</option>
+                        <option value="forest">Orman Yeşili</option>
+                        <option value="ocean">Derin Okyanus</option>
+                    </select>
+                </div>
+
+                <div>
+                    <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin-bottom: 8px;">Yazı Boyutu</h4>
+                    <select id="fontSizeSelectSetting" onchange="changeFontSizeCustom(this.value)">
+                        <option value="12px">Küçük</option>
+                        <option value="14px">Orta (Varsayılan)</option>
+                        <option value="16px">Büyük</option>
+                    </select>
+                </div>
+
+                <div>
+                    <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin-bottom: 8px;">Satır Sıklığı (Yoğunluk)</h4>
+                    <select id="densitySelectSetting" onchange="changeDensityCustom(this.value)">
+                        <option value="compact">Sıkışık Liste (Kompakt)</option>
+                        <option value="medium">Normal (Varsayılan)</option>
+                        <option value="cozy">Geniş Liste (Rahat)</option>
+                    </select>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 5px;">
+                    <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin-bottom: 8px;">Önbellek Yönetimi</h4>
+                    <button class="btn btn-secondary" onclick="clearCacheFromServer()" style="color: var(--accent-yellow); border-color: rgba(245, 158, 11, 0.3); width: auto; font-size: 12px; padding: 8px 15px !important; height: auto !important;">🧹 Önbelleği Temizle</button>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Bu işlem; önizleme dosyalarını (Temp_Preview), PDF sayfa sayısı önbelleğini ve arama önbelleğini temizler.</p>
+                </div>
+            </div>
+
+            <!-- Folders Settings Tab -->
+            <div id="settingsTabFolders" style="display: none; flex-direction: column; gap: 12px; text-align: left;">
+                <h4 style="font-size:14px; color:var(--text-color);">📁 Klasörleri Yönet</h4>
+                <div id="settingsFolderList" style="display:flex; flex-direction:column; gap:4px; max-height:150px; overflow-y:auto; background: rgba(0,0,0,0.2); padding:8px; border-radius:8px; border:1px solid var(--border-color);">
+                </div>
+                <div style="display:flex; gap:6px; margin-top:5px;">
+                    <input type="text" id="newFolderSettingsInput" placeholder="Yeni klasör adı..." style="flex-grow:1; padding:8px; font-size:13px; margin:0;">
+                    <button class="btn" onclick="addFolderFromSettings()" style="width:auto; padding:8px 16px; font-size:13px; height: auto;">Ekle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2FA Modal -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <h3>İki Adımlı Doğrulama (2FA)</h3>
+            <p style="font-size: 13px; color: var(--text-muted);">Hesabınızda iki adımlı doğrulama şifresi etkindir. Lütfen Telegram şifrenizi girin:</p>
+            <input type="password" id="passwordInput" placeholder="Telegram Şifreniz">
+            <button class="btn" onclick="submitPassword()">Giriş Yap</button>
+        </div>
+    </div>
+
+    <!-- Verification Code Modal -->
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <h3>Doğrulama Kodu</h3>
+            <p style="font-size: 13px; color: var(--text-muted);" id="codeModalMsg">Telegram uygulamanıza gönderilen giriş kodunu yazın:</p>
+            <input type="text" id="codeInput" placeholder="Doğrulama Kodu">
+            <button class="btn" onclick="submitCode()">Kodu Doğrula</button>
+        </div>
+    </div>
+
+    <!-- Download Folder Choice Modal -->
+    <div class="modal" id="downloadModal">
+        <div class="modal-content">
+            <h3>Klasör Seçimi</h3>
+            <p style="font-size: 13px; color: var(--text-muted);">İndirmek istediğiniz klasörü seçin:</p>
+            <div id="dynamicFolderButtons" style="display:flex; flex-direction:column; gap:8px; max-height:200px; overflow-y:auto; margin-bottom:10px;">
+            </div>
+            <div style="border-top: 1px solid var(--border-color); padding-top:10px; display:flex; flex-direction:column; gap:8px;">
+                <input type="text" id="customFolderInput" placeholder="Özel klasör adı veya tam bilgisayar yolu (Örn: C:\İndirilenler)..." style="margin:0;">
+                <p style="font-size: 11px; color: var(--text-muted); text-align: left; margin: 0 4px; line-height: 1.4;">* Klasör adı girerseniz 'indirilenler' altına kaydedilir. Tam yol girerseniz bilgisayarınızda doğrudan o konuma kaydedilir.</p>
+                <button class="btn" onclick="confirmDownloadWithNewFolder()" style="background: var(--primary-color);">Bu Konuma İndir</button>
+                <button class="btn btn-secondary" onclick="closeDownloadModal()">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal" id="previewModal">
+        <div class="modal-content" style="width: 80%; height: 85vh; max-width: 950px; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 10px;">
+                <h3 id="previewModalTitle" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 70%;">Önizleme</h3>
+                <button class="btn btn-secondary" onclick="closeModal('previewModal')" style="width: auto; padding: 5px 15px;">Kapat</button>
+            </div>
+            
+            <div id="pdfSearchArea" style="display: none; margin-bottom: 10px;">
+                <div class="pdf-search-box">
+                    <input type="text" id="pdfSearchInput" placeholder="PDF metinleri içinde ara..." onkeydown="if(event.keyCode===13) searchPdfText()">
+                    <button class="btn" onclick="searchPdfText()" style="width: auto; padding: 8px 15px;">Ara</button>
+                </div>
+                <div class="pdf-search-results" id="pdfSearchResults" style="display: none;"></div>
+            </div>
+
+            <div id="previewModalBody" style="flex-grow: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; border-radius: 8px; position: relative;"></div>
+            
+            <div id="audioControlsArea" style="display: none; margin-top: 10px;">
+                <div class="audio-speed-controls">
+                    <span style="font-size: 12px; color: var(--text-muted); align-self: center; margin-right: 5px;">Oynatma Hızı:</span>
+                    <button class="speed-btn active" onclick="changePlaybackSpeed(1.0, this)">1.0x</button>
+                    <button class="speed-btn" onclick="changePlaybackSpeed(1.25, this)">1.25x</button>
+                    <button class="speed-btn" onclick="changePlaybackSpeed(1.5, this)">1.5x</button>
+                    <button class="speed-btn" onclick="changePlaybackSpeed(2.0, this)">2.0x</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let globalSelectedItems = {};
+        let currentTab = 'all';
+        let currentSubFilter = 'Tümü';
+        let activeChannelId = null;
+        let activeChannelName = '';
+        let channelsData = [];
+        let mediaData = [];
+        let renderedCount = 100;
+        let downloadInterval = null;
+        let selectedDownloadMessageId = null;
+        let selectedDownloadFilename = null;
+        let selectedDownloadChannelId = null;
+        let activePreviewChannelId = null;
+        let isBatchMode = false;
+        let activePreviewMessageId = null;
+        let activeTagFilters = [];
+        let currentSort = 'dateNew';
+        let foldersData = [];
+        let maxFileSizeFilter = 100;
+        let savedAccounts = {};
+        let activePhone = "";
+
+        // Personalization controls
+        function initPersonalization() {
+            // Theme
+            const savedTheme = localStorage.getItem('user-theme') || 'dark';
+            applyTheme(savedTheme);
+            const themeSelect = document.getElementById('themeSelectSetting');
+            if (themeSelect) themeSelect.value = savedTheme;
+
+            // Font Size
+            const savedSize = localStorage.getItem('user-font-size') || '14px';
+            applyFontSize(savedSize);
+            const sizeSelect = document.getElementById('fontSizeSelectSetting');
+            if (sizeSelect) sizeSelect.value = savedSize;
+
+            // Density
+            const savedDensity = localStorage.getItem('user-density') || 'medium';
+            applyDensity(savedDensity);
+            const densitySelect = document.getElementById('densitySelectSetting');
+            if (densitySelect) densitySelect.value = savedDensity;
+        }
+
+        function applyTheme(theme) {
+            document.body.classList.remove('theme-light', 'theme-cyberpunk', 'theme-forest', 'theme-ocean');
+            if (theme !== 'dark') {
+                document.body.classList.add('theme-' + theme);
+            }
+        }
+
+        function changeThemeCustom(theme) {
+            localStorage.setItem('user-theme', theme);
+            applyTheme(theme);
+        }
+
+        function applyFontSize(size) {
+            document.documentElement.style.setProperty('--base-font-size', size);
+        }
+
+        function changeFontSizeCustom(size) {
+            localStorage.setItem('user-font-size', size);
+            applyFontSize(size);
+        }
+
+        function applyDensity(density) {
+            let paddingVal = '10px 16px';
+            if (density === 'compact') paddingVal = '5px 12px';
+            if (density === 'cozy') paddingVal = '16px 20px';
+            document.documentElement.style.setProperty('--row-padding', paddingVal);
+        }
+
+        function changeDensityCustom(density) {
+            localStorage.setItem('user-density', density);
+            applyDensity(density);
+        }
+
+        // Settings tab switcher
+        function switchSettingsTab(tabName) {
+            const tabs = ['accounts', 'display', 'folders'];
+            tabs.forEach(t => {
+                const element = document.getElementById(`settingsTab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                const btn = document.getElementById(`settings${t.charAt(0).toUpperCase() + t.slice(1)}TabBtn`);
+                if (t === tabName) {
+                    element.style.display = 'flex';
+                    btn.classList.add('active');
+                } else {
+                    element.style.display = 'none';
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Turkish character translation
+        function trNormalize(str) {
+            if (!str) return '';
+            return str.toLowerCase()
+                .replace(/ı/g, 'i')
+                .replace(/ö/g, 'o')
+                .replace(/ü/g, 'u')
+                .replace(/ş/g, 's')
+                .replace(/ç/g, 'c')
+                .replace(/ğ/g, 'g')
+                .replace(/[^a-z0-9]/g, '');
+        }
+
+        function escapeJSString(str) {
+            if (!str) return '';
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+        }
+
+        function getSimilarity(s1, s2) {
+            let longer = s1;
+            let shorter = s2;
+            if (s1.length < s2.length) {
+                longer = s2;
+                shorter = s1;
+            }
+            let longerLength = longer.length;
+            if (longerLength === 0) return 1.0;
+            return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+        }
+
+        function editDistance(s1, s2) {
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+            let costs = new Array();
+            for (let i = 0; i <= s1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i == 0) costs[j] = j;
+                    else {
+                        if (j > 0) {
+                            let newValue = costs[j - 1];
+                            if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                                newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                            costs[j - 1] = lastValue;
+                            lastValue = newValue;
+                        }
+                    }
+                }
+                if (i > 0) costs[s2.length] = lastValue;
+            }
+            return costs[s2.length];
+        }
+
+        window.onload = function() {
+            initPersonalization();
+            checkStatus();
+            startPollingDownloads();
+            loadFoldersFromServer();
+            loadAccounts();
+            goToHome();
+        };
+
+        function setStatus(dotColor, text) {
+            const dot = document.getElementById('statusDot');
+            dot.style.backgroundColor = dotColor === 'yellow' ? 'var(--accent-yellow)' : (dotColor === 'green' ? 'var(--accent-green)' : 'var(--accent-red)');
+            dot.style.boxShadow = `0 0 8px ${dot.style.backgroundColor}`;
+            document.getElementById('statusText').innerText = text;
+        }
+
+        async function checkStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+                
+                if (data.configured) {
+                    if (data.authorized) {
+                        setStatus('green', `Telegram'a Bağlandı - Telefon: ${data.phone}`);
+                        refreshChannels();
+                    } else {
+                        setStatus('red', 'Giriş Yetkisi Yok - Kod Gönderiliyor...');
+                        sendCodeRequest();
+                    }
+                } else {
+                    setStatus('red', 'Oturum Açılmamış / API Bilgileri Boş');
+                    openSettingsModal("Lütfen Giriş Bilgilerini Doldurun:");
+                }
+            } catch (err) {
+                setStatus('red', 'Sunucuya bağlanılamadı.');
+            }
+        }
+
+        async function loadAccounts() {
+            try {
+                const res = await fetch('/api/accounts');
+                const data = await res.json();
+                savedAccounts = data.accounts || {};
+                activePhone = data.active_phone || "";
+                renderAccountsList();
+            } catch (e) {
+                console.error("Hesaplar yüklenemedi:", e);
+            }
+        }
+
+        function renderAccountsList() {
+            const list = document.getElementById('savedAccountsList');
+            if (!list) return;
+            list.innerHTML = "";
+            const keys = Object.keys(savedAccounts);
+            if (keys.length === 0) {
+                list.innerHTML = `<span style="font-size:12px; color:var(--text-muted)">Kayıtlı hesap bulunmamaktadır.</span>`;
+                return;
+            }
+
+            keys.forEach(phone => {
+                const acc = savedAccounts[phone];
+                const card = document.createElement('div');
+                card.className = `account-card ${phone === activePhone ? 'active' : ''}`;
+                card.onclick = () => switchAccount(phone);
+                card.innerHTML = `
+                    <div class="account-info">
+                        <span class="account-phone">${phone}</span>
+                        <span class="account-api">API ID: ${acc.api_id}</span>
+                    </div>
+                    <button class="account-delete-btn" onclick="event.stopPropagation(); deleteAccount('${phone}')" title="Hesabı Sil">✕</button>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        async function switchAccount(phone) {
+            setStatus('yellow', `Hesap değiştiriliyor: ${phone}...`);
+            try {
+                const res = await fetch('/api/switch_account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    await loadAccounts();
+                    closeSettingsModal();
+                    await checkStatus();
+                } else {
+                    setStatus('red', 'Hesap değiştirilemedi: ' + data.detail);
+                }
+            } catch (e) {
+                setStatus('red', 'Hesap değiştirilemedi.');
+            }
+        }
+
+        async function deleteAccount(phone) {
+            if (!confirm(`${phone} hesabını silmek istediğinize emin misiniz?`)) return;
+            try {
+                const res = await fetch(`/api/accounts?phone=${encodeURIComponent(phone)}`, { method: 'DELETE' });
+                if (res.ok) {
+                    await loadAccounts();
+                    await checkStatus();
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function sendCodeRequest() {
+            setStatus('yellow', 'Doğrulama kodu gönderiliyor...');
+            try {
+                const res = await fetch('/api/send_code', { method: 'POST' });
+                const data = await res.json();
+                if (res.ok) {
+                    setStatus('yellow', 'Doğrulama kodu bekleniyor...');
+                    document.getElementById('codeModalMsg').innerText = "Telegram uygulamanıza gönderilen giriş kodunu yazın:";
+                    openModal('codeModal');
+                } else {
+                    setStatus('red', 'Kod gönderilemedi: ' + data.detail);
+                }
+            } catch (err) {
+                setStatus('red', 'Kod gönderme hatası: ' + err);
+            }
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function openSettingsModal(msg) {
+            if (msg) document.getElementById('settingsTitle').innerText = msg;
+            switchSettingsTab('accounts');
+            
+            // Prefill with active account info if present
+            fetch('/api/status').then(r => r.json()).then(data => {
+                document.getElementById('apiIdInput').value = data.api_id || '';
+                document.getElementById('apiHashInput').value = data.api_hash || '';
+                document.getElementById('phoneInput').value = data.phone || '';
+            });
+            loadAccounts();
+            openModal('settingsModal');
+        }
+        function closeSettingsModal() {
+            closeModal('settingsModal');
+        }
+
+        async function saveSettings() {
+            const api_id = document.getElementById('apiIdInput').value;
+            const api_hash = document.getElementById('apiHashInput').value;
+            const phone = document.getElementById('phoneInput').value;
+            
+            closeSettingsModal();
+            setStatus('yellow', 'Ayarlar kaydediliyor...');
+            
+            try {
+                const res = await fetch('/api/save_config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ api_id, api_hash, phone })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    setStatus('yellow', 'Telegram yeniden başlatılıyor...');
+                    await loadAccounts();
+                    setTimeout(checkStatus, 3000);
+                } else {
+                    setStatus('red', 'Ayarlar kaydedilemedi: ' + data.detail);
+                }
+            } catch (err) {
+                setStatus('red', 'Hata: ' + err);
+            }
+        }
+
+        async function submitCode() {
+            const code = document.getElementById('codeInput').value;
+            closeModal('codeModal');
+            setStatus('yellow', 'Kod doğrulanıyor...');
+            
+            try {
+                const res = await fetch('/api/login_code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    if (data.status === '2fa_required') {
+                        setStatus('yellow', '2FA Şifresi Gerekiyor...');
+                        openModal('passwordModal');
+                    } else {
+                        setStatus('green', 'Giriş başarılı.');
+                        checkStatus();
+                    }
+                } else {
+                    setStatus('red', 'Kod doğrulanamadı.');
+                    openModal('codeModal');
+                    document.getElementById('codeModalMsg').innerText = "Girdiğiniz kod hatalı. Lütfen kodu tekrar girin:";
+                }
+            } catch (err) {
+                setStatus('red', 'Doğrulama hatası: ' + err);
+            }
+        }
+
+        async function submitPassword() {
+            const password = document.getElementById('passwordInput').value;
+            closeModal('passwordModal');
+            setStatus('yellow', 'Şifre doğrulanıyor...');
+            
+            try {
+                const res = await fetch('/api/login_2fa', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    setStatus('green', 'Giriş başarılı.');
+                    checkStatus();
+                } else {
+                    setStatus('red', 'Şifre hatalı: ' + data.detail);
+                    openModal('passwordModal');
+                }
+            } catch (err) {
+                setStatus('red', 'Şifre doğrulama hatası: ' + err);
+            }
+        }
+
+        async function logout() {
+            closeSettingsModal();
+            setStatus('yellow', 'Oturum kapatılıyor...');
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                await loadAccounts();
+                checkStatus();
+            } catch (err) {
+                setStatus('red', 'Oturum kapatılamadı.');
+            }
+        }
+
+        async function refreshChannels() {
+            const rawQuery = document.getElementById('sidebarSearch').value.trim();
+            const showArchived = document.getElementById('showArchivedCheck') ? document.getElementById('showArchivedCheck').checked : false;
+            try {
+                const res = await fetch(`/api/channels?show_archived=${showArchived}`);
+                const data = await res.json();
+                
+                let loadedChannels = data.channels || [];
+                
+                if (rawQuery) {
+                    const normQuery = trNormalize(rawQuery);
+                    loadedChannels = loadedChannels.filter(c => {
+                        const normName = trNormalize(c.name);
+                        if (normName.includes(normQuery)) return true;
+                        const sim = getSimilarity(normQuery, normName);
+                        return sim >= 0.6;
+                    });
+                }
+                
+                channelsData = loadedChannels;
+                renderChannels();
+            } catch (err) {
+                console.error("Kanallar yüklenemedi", err);
+            }
+        }
+
+        function filterChannels() {
+            refreshChannels();
+        }
+
+        function renderChannels() {
+            const list = document.getElementById('channelList');
+            list.innerHTML = '';
+            
+            if (channelsData.length === 0) {
+                list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">Kanal/Sohbet bulunamadı.</div>';
+                return;
+            }
+            
+            channelsData.forEach(c => {
+                const row = document.createElement('div');
+                row.className = 'channel-row';
+                if (c.id === activeChannelId) row.classList.add('active');
+                
+                const initials = c.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+                let avatarColor = 'linear-gradient(135deg, #6366f1, #4f46e5)';
+                if (c.type === 'group') {
+                    avatarColor = 'linear-gradient(135deg, #10b981, #059669)';
+                } else if (c.type === 'user') {
+                    avatarColor = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                }
+                const avatarHtml = `<div class="channel-avatar" style="background: ${avatarColor};">${initials || '?'}</div>`;
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'channel-name';
+                nameSpan.innerHTML = `${avatarHtml} ${c.name}`;
+                nameSpan.onclick = () => selectChannel(c.id, c.name, row);
+                
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'channel-actions';
+                
+                const muteBtn = document.createElement('button');
+                muteBtn.className = 'action-icon-btn';
+                muteBtn.title = c.muted ? "Sesi Aç" : "Sessize Al";
+                muteBtn.innerHTML = c.muted 
+                    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></svg>`
+                    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+                muteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleMute(c.id, !c.muted, c.name);
+                };
+                
+                const isArchived = c.folder_id === 1;
+                const archiveBtn = document.createElement('button');
+                archiveBtn.className = 'action-icon-btn';
+                archiveBtn.title = isArchived ? "Arşivden Çıkar" : "Arşive Taşı";
+                archiveBtn.innerHTML = isArchived 
+                    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>`
+                    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>`;
+                archiveBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleArchive(c.id, !isArchived, c.name);
+                };
+                
+                const leaveBtn = document.createElement('button');
+                leaveBtn.className = 'action-icon-btn destruct';
+                leaveBtn.title = c.type === 'user' ? "Sohbeti Sil" : "Ayrıl";
+                leaveBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`;
+                leaveBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    leaveChannel(c.id, c.name, c.type);
+                };
+                
+                actionsDiv.appendChild(muteBtn);
+                actionsDiv.appendChild(archiveBtn);
+                actionsDiv.appendChild(leaveBtn);
+                
+                row.appendChild(nameSpan);
+                row.appendChild(actionsDiv);
+                list.appendChild(row);
+            });
+
+            if (!activeChannelId && window.location.hash.startsWith('#channel=')) {
+                const hashId = parseInt(window.location.hash.replace('#channel=', ''));
+                const channel = channelsData.find(c => c.id === hashId);
+                if (channel) {
+                    selectChannel(channel.id, channel.name);
+                }
+            }
+        }
+
+        function selectChannel(id, name, rowElement) {
+            activeChannelId = id;
+            activeChannelName = name;
+            window.location.hash = "channel=" + id;
+            
+            document.querySelectorAll('.channel-row').forEach(el => el.classList.remove('active'));
+            if (rowElement) {
+                rowElement.classList.add('active');
+            } else {
+                document.querySelectorAll('.channel-row').forEach(el => {
+                    if (el.querySelector('.channel-name').innerText.includes(name)) {
+                        el.classList.add('active');
+                    }
+                });
+            }
+
+            const channel = channelsData.find(c => c.id === id);
+            if (channel) {
+                document.getElementById('channelInfoPanel').style.display = 'flex';
+                document.getElementById('rightPanelName').innerText = channel.name;
+                
+                const initials = channel.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+                document.getElementById('rightPanelAvatar').innerText = initials || '?';
+                
+                const typeText = channel.type === 'group' ? 'Grup' : (channel.type === 'user' ? 'Kullanıcı' : 'Kanal');
+                document.getElementById('rightPanelType').innerText = typeText;
+                
+                const muteBtn = document.getElementById('rightPanelMuteBtn');
+                if (channel.muted) {
+                    muteBtn.innerHTML = '🔊 Sesi Aç';
+                } else {
+                    muteBtn.innerHTML = '🔇 Sessiz';
+                }
+            }
+            
+            renderedCount = 100;
+            loadMedia();
+        }
+
+        async function toggleMute(id, mute, name) {
+            setStatus('yellow', `${name} sohbetinin bildirim durumu güncelleniyor...`);
+            try {
+                const res = await fetch('/api/toggle_mute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channel_id: id, mute: mute })
+                });
+                if (res.ok) {
+                    setStatus('green', `Bildirim durumu güncellendi: ${name}`);
+                    refreshChannels();
+                } else {
+                    const data = await res.json();
+                    setStatus('red', `Hata: ${data.detail}`);
+                }
+            } catch (err) {
+                setStatus('red', 'Hata oluştu.');
+            }
+        }
+
+        async function toggleArchive(id, archive, name) {
+            setStatus('yellow', `${name} arşive taşınıyor...`);
+            try {
+                const res = await fetch('/api/toggle_archive', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channel_id: id, archive: archive })
+                });
+                if (res.ok) {
+                    setStatus('green', `Arşiv durumu güncellendi: ${name}`);
+                    refreshChannels();
+                } else {
+                    const data = await res.json();
+                    setStatus('red', `Hata: ${data.detail}`);
+                }
+            } catch (err) {
+                setStatus('red', 'Hata oluştu.');
+            }
+        }
+
+        async function leaveChannel(id, name, type) {
+            const label = type === 'user' ? 'sohbetini silmek' : 'sohbetinden ayrılmak';
+            const confirmed = confirm(`"${name}" ${label} istediğinize emin misiniz?`);
+            if (!confirmed) return;
+            
+            setStatus('yellow', `${name} işlem yapılıyor...`);
+            try {
+                const res = await fetch('/api/leave_channel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channel_id: id })
+                });
+                if (res.ok) {
+                    setStatus('green', `İşlem başarılı: ${name}`);
+                    if (activeChannelId === id) {
+                        activeChannelId = null;
+                        activeChannelName = '';
+                        window.location.hash = '';
+                        document.getElementById('mediaList').innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-muted);">Medyaları görüntülemek için soldan bir kanal seçin.</div>';
+                    }
+                    refreshChannels();
+                } else {
+                    const data = await res.json();
+                    setStatus('red', `Hata: ${data.detail}`);
+                }
+            } catch (err) {
+                setStatus('red', 'Hata oluştu.');
+            }
+        }
+
+        function renderDynamicTagFilters(topTags) {
+            const group = document.getElementById('tagFiltersGroup');
+            const searchInput = document.getElementById('tagSearchInput');
+            if (!group) return;
+            group.innerHTML = '';
+            
+            if (searchInput) {
+                searchInput.value = '';
+                if (!topTags || topTags.length === 0) {
+                    searchInput.style.display = 'none';
+                } else {
+                    searchInput.style.display = 'block';
+                }
+            }
+            
+            if (!topTags || topTags.length === 0) {
+                group.innerHTML = '<span style="font-size: 12px; color: var(--text-muted); padding: 6px 12px;">Etiket bulunamadı</span>';
+                return;
+            }
+            
+            topTags.forEach(tag => {
+                const btn = document.createElement('button');
+                btn.className = 'sub-btn';
+                btn.onclick = () => toggleTagFilter(btn, tag);
+                btn.innerText = tag;
+                group.appendChild(btn);
+            });
+        }
+
+        function filterTagButtons(query) {
+            const normQuery = trNormalize(query);
+            const buttons = document.querySelectorAll('#tagFiltersGroup .sub-btn');
+            buttons.forEach(btn => {
+                const tagText = trNormalize(btn.innerText);
+                if (tagText.includes(normQuery)) {
+                    btn.style.display = 'inline-flex';
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+        }
+
+        function getTagBadgeStyle(t) {
+            const tagNormalized = trNormalize(t);
+            const knownStyles = {
+                'pdf': { bg: 'rgba(239, 68, 68, 0.1)', text: '#f87171', border: 'rgba(239, 68, 68, 0.2)' },
+                'saglik': { bg: 'rgba(16, 185, 129, 0.1)', text: '#34d399', border: 'rgba(16, 185, 129, 0.2)' },
+                'fen': { bg: 'rgba(59, 130, 246, 0.1)', text: '#60a5fa', border: 'rgba(59, 130, 246, 0.2)' },
+                'sosyal': { bg: 'rgba(245, 158, 11, 0.1)', text: '#fbbf24', border: 'rgba(245, 158, 11, 0.2)' },
+                'yokdil': { bg: 'rgba(139, 92, 246, 0.15)', text: '#c084fc', border: 'rgba(139, 92, 246, 0.25)' },
+                'yds': { bg: 'rgba(6, 182, 212, 0.15)', text: '#22d3ee', border: 'rgba(6, 182, 212, 0.25)' }
+            };
+            
+            if (knownStyles[tagNormalized]) {
+                const s = knownStyles[tagNormalized];
+                return `background-color: ${s.bg} !important; color: ${s.text} !important; border: 1px solid ${s.border};`;
+            }
+            
+            let hash = 0;
+            for (let i = 0; i < t.length; i++) {
+                hash = t.charCodeAt(i) + ((hash << 5) - hash);
+            }
+                const h = Math.abs(hash) % 360;
+            const textColor = `hsl(${h}, 70%, 75%)`;
+            const bgColor = `hsla(${h}, 70%, 55%, 0.12)`;
+            const borderColor = `hsla(${h}, 70%, 55%, 0.25)`;
+            return `background-color: ${bgColor} !important; color: ${textColor} !important; border: 1px solid ${borderColor};`;
+        }
+
+        function goToHome() {
+            activeChannelId = null;
+            activeChannelName = '';
+            window.location.hash = '';
+            
+            document.querySelectorAll('.channel-row').forEach(el => el.classList.remove('active'));
+            closeRightPanel();
+            
+            const group = document.getElementById('tagFiltersGroup');
+            if (group) group.innerHTML = '<span style="font-size: 12px; color: var(--text-muted); padding: 6px 12px;">Sohbet seçilince yüklenecek...</span>';
+            const searchInput = document.getElementById('tagSearchInput');
+            if (searchInput) searchInput.style.display = 'none';
+            
+            const mediaList = document.getElementById('mediaList');
+            if (mediaList) {
+                mediaList.innerHTML = `
+                    <div style="padding: 60px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 20px; animation: fadeIn 0.4s ease;">
+                        <h1 style="font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #a5b4fc, #6366f1, #4f46e5); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Hoş Geldiniz! 👋</h1>
+                        <p style="color: var(--text-muted); font-size: 16px; max-width: 500px; line-height: 1.6;">Telegram Sınav Sorusu ve Medya İndirme Paneline hoş geldiniz. Görüntülemek veya işlem yapmak için lütfen sol taraftaki listeden bir kanal veya grup seçin.</p>
+                        <div style="margin-top: 10px; padding: 16px 24px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 12px; font-size: 13px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 8px;">
+                            <span class="status-dot" style="background-color: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); position: relative; display: inline-block; margin: 0;"></span>
+                            Sistem Durumu: <span style="color: var(--accent-green); font-weight: 600;">Aktif ve Hazır</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            const firstTab = document.querySelector('.tab-btn');
+            if (firstTab) firstTab.classList.add('active');
+            currentTab = 'all';
+            
+            // Clean up main search box
+            const mainSearch = document.getElementById('mainSearch');
+            if (mainSearch) mainSearch.value = '';
+            
+            // Reset counts
+            mediaData = [];
+            updateTabCounters();
+        }
+
+
+
+        async function loadMedia() {
+            if (!activeChannelId) return;
+            const mediaList = document.getElementById('mediaList');
+            mediaList.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-muted);">Medyalar taranıyor, lütfen bekleyin...</div>';
+            
+            try {
+                const res = await fetch(`/api/media?channel_id=${activeChannelId}&category=all&show_messages=false`);
+                const data = await res.json();
+                mediaData = data.media || [];
+                const topTags = data.top_tags || [];
+                activeTagFilters = [];
+                renderDynamicTagFilters(topTags);
+                renderMedia();
+                updateTabCounters();
+            } catch (err) {
+                mediaList.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--accent-red);">Medyalar taranamadı. Oturumunuzu veya bağlantınızı kontrol edin.</div>';
+            }
+        }
+
+        function updateTabCounters() {
+            let docCount = 0;
+            let photoCount = 0;
+            let audioCount = 0;
+            let linkCount = 0;
+            
+            mediaData.forEach(item => {
+                const mediaType = item.type;
+                const hasLink = item.links && item.links.length > 0;
+                
+                if (hasLink) linkCount++;
+                if (mediaType === 'Belge') docCount++;
+                if (mediaType === 'Görsel') photoCount++;
+                if (mediaType === 'Ses') audioCount++;
+            });
+
+            const rDoc = document.getElementById('rightPanelDocCount');
+            const rPhoto = document.getElementById('rightPanelPhotoCount');
+            const rAudio = document.getElementById('rightPanelAudioCount');
+            const rLink = document.getElementById('rightPanelLinkCount');
+            if (rDoc) rDoc.innerText = docCount;
+            if (rPhoto) rPhoto.innerText = photoCount;
+            if (rAudio) rAudio.innerText = audioCount;
+            if (rLink) rLink.innerText = linkCount;
+            
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                const onclickText = tab.getAttribute('onclick') || '';
+                if (onclickText.includes("'all'")) {
+                    tab.innerText = `Sohbet Akışı (${mediaData.length})`;
+                } else if (onclickText.includes("'document'")) {
+                    tab.innerText = `Belgeler / Dokümanlar (${docCount})`;
+                } else if (onclickText.includes("'photo'")) {
+                    tab.innerText = `Görseller / Fotoğraflar (${photoCount})`;
+                } else if (onclickText.includes("'audio'")) {
+                    tab.innerText = `Ses / Ses Kayıtları (${audioCount})`;
+                } else if (onclickText.includes("'link'")) {
+                    tab.innerText = `Bağlantılar / Linkler (${linkCount})`;
+                }
+            });
+        }
+
+        function switchTab(btn, tab) {
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            currentTab = tab;
+            
+            const group = document.getElementById('subFiltersGroup');
+            const subContainer = document.getElementById('subFilterContainer');
+            
+            if (tab === 'link' || tab === 'all') {
+                subContainer.style.display = 'none';
+            } else {
+                subContainer.style.display = 'flex';
+                if (tab === 'document') {
+                    group.innerHTML = `
+                        <button class="sub-btn active" onclick="switchSubFilter(this, 'Tümü')">Tümü</button>
+                        <button class="sub-btn" onclick="switchSubFilter(this, 'PDF')">PDF</button>
+                        <button class="sub-btn" onclick="switchSubFilter(this, 'DOC/DOCX')">DOC/DOCX</button>
+                        <button class="sub-btn" onclick="switchSubFilter(this, 'Diğer')">Diğer</button>
+                    `;
+                } else if (tab === 'photo') {
+                    group.innerHTML = `
+                        <button class="sub-btn active" onclick="switchSubFilter(this, 'Tümü')">Tümü</button>
+                        <button class="sub-btn" onclick="switchSubFilter(this, 'JPG/JPEG')">JPG/JPEG</button>
+                        <button class="sub-btn" onclick="switchSubFilter(this, 'PNG')">PNG</button>
+                        <button class="sub-btn" onclick="switchSubFilter(this, 'Diğer')">Diğer</button>
+                    `;
+                } else {
+                    group.innerHTML = `
+                        <button class="sub-btn active" onclick="switchSubFilter(this, 'Tümü')">Tümü</button>
+                        <button class="sub-btn" onclick="switchSubFilter(this, 'MP3')">MP3</button>
+                        <button class="sub-btn" onclick="switchSubFilter(this, 'OGG/WAV')">OGG/WAV</button>
+                        <button class="sub-btn" onclick="switchSubFilter(this, 'Diğer')">Diğer</button>
+                    `;
+                }
+            }
+            currentSubFilter = 'Tümü';
+            renderedCount = 100;
+            renderMedia();
+        }
+
+        function switchSubFilter(btn, filter) {
+            document.querySelectorAll('.sub-btn').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            currentSubFilter = filter;
+            renderedCount = 100;
+            renderMedia();
+        }
+
+        function filterMediaList() {
+            renderedCount = 100;
+            renderMedia();
+        }
+
+        function toggleSelectAll(masterCheckbox) {
+            const checkboxes = document.querySelectorAll('.media-select-check');
+            checkboxes.forEach(cb => {
+                cb.checked = masterCheckbox.checked;
+                const chId = parseInt(cb.dataset.channelId) || activeChannelId;
+                const msgId = parseInt(cb.dataset.msgId);
+                const filename = cb.dataset.filename;
+                const key = `${chId}_${msgId}`;
+                if (masterCheckbox.checked) {
+                    globalSelectedItems[key] = { channel_id: chId, message_id: msgId, filename: filename };
+                } else {
+                    delete globalSelectedItems[key];
+                }
+            });
+            updateFloatingBatchBar();
+        }
+
+        function updateFloatingBatchBar() {
+            const count = Object.keys(globalSelectedItems).length;
+            const bar = document.getElementById('floatingBatchBar');
+            const text = document.getElementById('floatingBatchText');
+            
+            if (count > 0) {
+                text.innerText = `${count} dosya seçildi`;
+                bar.style.display = 'flex';
+            } else {
+                bar.style.display = 'none';
+            }
+        }
+
+        function clearAllSelection() {
+            globalSelectedItems = {};
+            document.querySelectorAll('.media-select-check').forEach(cb => cb.checked = false);
+            const master = document.getElementById('masterSelectCheck');
+            if (master) master.checked = false;
+            updateFloatingBatchBar();
+        }
+
+        function invertSelection() {
+            document.querySelectorAll('.media-select-check').forEach(cb => {
+                cb.checked = !cb.checked;
+                const chId = parseInt(cb.dataset.channelId) || activeChannelId;
+                const msgId = parseInt(cb.dataset.msgId);
+                const filename = cb.dataset.filename;
+                const key = `${chId}_${msgId}`;
+                if (cb.checked) {
+                    globalSelectedItems[key] = { channel_id: chId, message_id: msgId, filename: filename };
+                } else {
+                    delete globalSelectedItems[key];
+                }
+            });
+            updateFloatingBatchBar();
+        }
+
+        function selectOnlyPdfs() {
+            document.querySelectorAll('.media-select-check').forEach(cb => {
+                const filename = cb.dataset.filename || '';
+                const chId = parseInt(cb.dataset.channelId) || activeChannelId;
+                const msgId = parseInt(cb.dataset.msgId);
+                const key = `${chId}_${msgId}`;
+                if (filename.toLowerCase().endsWith('.pdf')) {
+                    cb.checked = true;
+                    globalSelectedItems[key] = { channel_id: chId, message_id: msgId, filename: filename };
+                } else {
+                    cb.checked = false;
+                    delete globalSelectedItems[key];
+                }
+            });
+            updateFloatingBatchBar();
+        }
+
+        function triggerSelectedBatchDownload() {
+            const selected = Object.values(globalSelectedItems);
+
+            if (selected.length === 0) {
+                alert("Lütfen önce indirmek istediğiniz dosyaları seçin.");
+                return;
+            }
+
+            isBatchMode = true;
+            openModal('downloadModal');
+        }
+
+        function renderMedia() {
+            const list = document.getElementById('mediaList');
+            list.innerHTML = '';
+            
+            const rawQuery = document.getElementById('mainSearch').value.trim();
+            const hideMessages = true;
+            
+            let filtered = mediaData.filter(item => {
+                const mediaType = item.type;
+                const hasLink = item.links && item.links.length > 0;
+                
+                if (currentTab === 'link') {
+                    if (!hasLink) return false;
+                } else if (currentTab === 'document') {
+                    if (mediaType !== 'Belge') return false;
+                } else if (currentTab === 'photo') {
+                    if (mediaType !== 'Görsel') return false;
+                } else if (currentTab === 'audio') {
+                    if (mediaType !== 'Ses') return false;
+                }
+                
+                if (currentTab !== 'link' && currentSubFilter !== 'Tümü') {
+                    const ext = item.ext.toLowerCase();
+                    if (currentTab === 'document') {
+                        if (currentSubFilter === 'PDF' && ext !== '.pdf') return false;
+                        if (currentSubFilter === 'DOC/DOCX' && ext !== '.doc' && ext !== '.docx') return false;
+                        if (currentSubFilter === 'Diğer' && (ext === '.pdf' || ext === '.doc' || ext === '.docx')) return false;
+                    } else if (currentTab === 'photo') {
+                        if (currentSubFilter === 'JPG/JPEG' && ext !== '.jpg' && ext !== '.jpeg') return false;
+                        if (currentSubFilter === 'PNG' && ext !== '.png') return false;
+                        if (currentSubFilter === 'Diğer' && (ext === '.jpg' || ext === '.jpeg' || ext === '.png')) return false;
+                    } else if (currentTab === 'audio') {
+                        if (currentSubFilter === 'MP3' && ext !== '.mp3') return false;
+                        if (currentSubFilter === 'OGG/WAV' && ext !== '.ogg' && ext !== '.wav') return false;
+                        if (currentSubFilter === 'Diğer' && (ext === '.mp3' || ext === '.ogg' || ext === '.wav')) return false;
+                    }
+                }
+                
+                if (activeTagFilters.length > 0) {
+                    for (let tag of activeTagFilters) {
+                        if (!item.tags || !item.tags.includes(tag)) {
+                            return false;
+                        }
+                    }
+                }
+                
+                if (rawQuery) {
+                    const normQuery = trNormalize(rawQuery);
+                    const normText = trNormalize(item.text || '');
+                    const normName = trNormalize(item.name || '');
+                    
+                    if (normText.includes(normQuery) || normName.includes(normQuery)) {
+                        return true;
+                    }
+                    
+                    const simText = getSimilarity(normQuery, normText);
+                    const simName = getSimilarity(normQuery, normName);
+                    if (simText < 0.6 && simName < 0.6) return false;
+                }
+                
+                return true;
+            });
+            
+            filtered.sort((a, b) => b.timestamp - a.timestamp);
+            
+            if (filtered.length === 0) {
+                list.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-muted);">Kriterlere uygun mesaj veya dosya bulunamadı.</div>';
+                return;
+            }
+
+            const batchControls = document.createElement('div');
+            batchControls.style = 'display: flex; align-items: center; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;';
+            batchControls.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="masterSelectCheck" onchange="toggleSelectAll(this)" style="cursor: pointer;">
+                        <label for="masterSelectCheck" style="font-weight: 600; font-size: 13px; color: var(--text-muted); cursor: pointer;">Tümünü Seç</label>
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="btn-small" onclick="invertSelection()" title="Seçimi Tersine Çevir">🔄 Ters Çevir</button>
+                        <button class="btn-small" onclick="selectOnlyPdfs()" title="Sadece PDF Dosyalarını Seç">📄 Sadece PDF'ler</button>
+                    </div>
+                </div>
+                <button class="btn" onclick="triggerSelectedBatchDownload()" style="width: auto; padding: 5px 15px; font-size: 12px; background: linear-gradient(to right, #4f46e5, #10b981); border: none;">Seçilenleri İndir</button>
+            `;
+            list.appendChild(batchControls);
+
+            const chunk = filtered.slice(0, renderedCount);
+
+            if (hideMessages && currentTab !== 'link') {
+                const header = document.createElement('div');
+                header.className = 'table-header';
+                header.innerHTML = `
+                    <div style="padding-left: 30px;">Dosya Adı</div>
+                    <div style="text-align: center;">Boyut</div>
+                    <div style="text-align: center;">Tarih</div>
+                    <div style="text-align: center;">İşlemler</div>
+                `;
+                list.appendChild(header);
+                
+                chunk.forEach(item => {
+                    if (!item.name) return;
+                    const sizeMB = item.size / (1024 * 1024);
+                    const sizeStr = sizeMB > 0.1 ? `${sizeMB.toFixed(2)} MB` : `${(item.size/1024).toFixed(1)} KB`;
+                    
+                    let tagsHtml = '';
+                    if (item.tags && item.tags.length > 0) {
+                        item.tags.forEach(t => {
+                            const badgeStyle = getTagBadgeStyle(t);
+                            tagsHtml += `<span class="badge-tag" style="cursor: pointer; ${badgeStyle}" onclick="event.stopPropagation(); filterByTag('${t}')">${t}</span>`;
+                        });
+                    }
+                    if (item.ext && item.ext.toLowerCase() === '.pdf') {
+                        if (item.page_count) {
+                            tagsHtml += `<span class="badge-tag" style="background-color: #374151; color: #f3f4f6; font-weight: 600; cursor: default;">📄 ${item.page_count} Sayfa</span>`;
+                        } else {
+                            tagsHtml += `<span class="badge-tag pdf-page-badge" data-msg-id="${item.id}" data-channel-id="${activeChannelId}" style="background-color: #374151; color: #f3f4f6; font-weight: 600; cursor: help;">📄 Sayfa: ...</span>`;
+                        }
+                    }
+                    
+                    let linkBtn = '';
+                    if (item.links && item.links.length > 0) {
+                        linkBtn = `<button class="btn-preview" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.3);" onclick="event.stopPropagation(); window.open('${escapeJSString(item.links[0])}', '_blank')">🔗 Git</button>`;
+                    }
+                    
+                    const row = document.createElement('div');
+                    row.className = 'media-row';
+                    row.style.position = 'relative';
+                    row.onclick = (e) => handleRowClick(e, row);
+                    const itemKey = `${activeChannelId}_${item.id}`;
+                    const isChecked = globalSelectedItems[itemKey] ? 'checked' : '';
+                    row.innerHTML = `
+                        <div style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);">
+                            <input type="checkbox" class="media-select-check" data-msg-id="${item.id}" data-filename="${escapeJSString(item.name)}" data-channel-id="${activeChannelId}" ${isChecked} style="cursor: pointer;">
+                        </div>
+                        <div class="file-name" title="${item.name}" style="padding-left: 30px; display: block; word-break: break-word; overflow-wrap: break-word;">
+                            <span style="font-weight: 600; vertical-align: middle;">${item.name}</span>
+                            <span style="display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: middle;">${tagsHtml}</span>
+                        </div>
+                        <div style="text-align: center; color: var(--text-muted);">${sizeStr}</div>
+                        <div style="text-align: center; color: var(--text-muted);">${item.date}</div>
+                        <div class="action-btns">
+                            ${linkBtn}
+                            <button class="btn-preview" onclick="event.stopPropagation(); previewFile(${item.id}, '${escapeJSString(item.name)}', '${escapeJSString(item.type)}')">Önizle</button>
+                            <button class="btn" onclick="event.stopPropagation(); openSingleDownloadModal(${item.id}, '${escapeJSString(item.name)}')">İndir</button>
+                        </div>
+                    `;
+                    list.appendChild(row);
+                });
+            }
+
+            if (filtered.length > renderedCount) {
+                const loadMore = document.createElement('button');
+                loadMore.className = 'load-more-btn';
+                loadMore.innerText = `Daha Fazla Yükle (${renderedCount} / ${filtered.length})`;
+                loadMore.onclick = () => {
+                    renderedCount += 100;
+                    renderMedia();
+                };
+                list.appendChild(loadMore);
+            }
+            
+            lazyLoadPdfPageCounts();
+            updateFloatingBatchBar();
+        }
+
+        function openSingleDownloadModal(msgId, filename, channelId = null) {
+            isBatchMode = false;
+            selectedDownloadMessageId = msgId;
+            selectedDownloadFilename = filename;
+            selectedDownloadChannelId = channelId || activeChannelId;
+            openModal('downloadModal');
+        }
+
+        function closeDownloadModal() {
+            closeModal('downloadModal');
+        }
+
+        async function confirmDownload(folder) {
+            closeDownloadModal();
+            if (!folder) return;
+            openModal('downloadsModal');
+            
+            if (isBatchMode) {
+                const selectedByChannel = {};
+                Object.values(globalSelectedItems).forEach(item => {
+                    const chId = item.channel_id;
+                    if (!selectedByChannel[chId]) {
+                        selectedByChannel[chId] = [];
+                    }
+                    selectedByChannel[chId].push({
+                        message_id: item.message_id,
+                        filename: item.filename
+                    });
+                });
+                
+                for (const [chId, downloads] of Object.entries(selectedByChannel)) {
+                    try {
+                        await fetch('/api/download_batch', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                channel_id: parseInt(chId),
+                                downloads: downloads,
+                                target_folder: folder
+                            })
+                        });
+                    } catch (err) {
+                        console.error("Batch download error:", err);
+                    }
+                }
+                clearAllSelection();
+            } else {
+                try {
+                    await fetch('/api/download', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            channel_id: selectedDownloadChannelId || activeChannelId,
+                            message_id: selectedDownloadMessageId,
+                            filename: selectedDownloadFilename,
+                            target_folder: folder
+                        })
+                    });
+                } catch (err) {
+                    console.error("İndirme hatası:", err);
+                }
+            }
+        }
+
+        async function previewFile(msgId, filename, type, channelId = null) {
+            const body = document.getElementById('previewModalBody');
+            const title = document.getElementById('previewModalTitle');
+            
+            activePreviewMessageId = msgId;
+            activePreviewChannelId = channelId || activeChannelId;
+            title.innerText = filename;
+            body.innerHTML = '<div style="color: white; font-weight: 600;">Dosya önizlemesi yükleniyor...</div>';
+            
+            const isPdf = filename.toLowerCase().endsWith('.pdf');
+            const pdfSearchArea = document.getElementById('pdfSearchArea');
+            const audioControlsArea = document.getElementById('audioControlsArea');
+            
+            if (isPdf) {
+                if (pdfSearchArea) {
+                    pdfSearchArea.style.display = 'block';
+                    document.getElementById('pdfSearchInput').value = '';
+                    const results = document.getElementById('pdfSearchResults');
+                    if (results) {
+                        results.innerHTML = '';
+                        results.style.display = 'none';
+                    }
+                }
+                if (audioControlsArea) audioControlsArea.style.display = 'none';
+            } else if (type === 'Ses') {
+                if (pdfSearchArea) pdfSearchArea.style.display = 'none';
+                if (audioControlsArea) {
+                    audioControlsArea.style.display = 'block';
+                    document.querySelectorAll('#audioControlsArea .speed-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.innerText === '1.0x') btn.classList.add('active');
+                    });
+                }
+            } else {
+                if (pdfSearchArea) pdfSearchArea.style.display = 'none';
+                if (audioControlsArea) audioControlsArea.style.display = 'none';
+            }
+            
+            openModal('previewModal');
+            const url = `/api/stream_preview?channel_id=${activePreviewChannelId}&message_id=${msgId}`;
+            const isVideo = filename.toLowerCase().endsWith('.mp4') || filename.toLowerCase().endsWith('.webm') || filename.toLowerCase().endsWith('.mov') || filename.toLowerCase().endsWith('.mkv');
+            
+            if (type === 'Görsel') {
+                body.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+            } else if (type === 'Ses') {
+                body.innerHTML = `
+                    <div style="display:flex; flex-direction:column; align-items:center; gap: 15px;">
+                        <span style="color: #9ca3af; font-size: 14px;">${filename}</span>
+                        <audio controls autoplay src="${url}" style="width: 400px;"></audio>
+                    </div>
+                `;
+            } else if (isVideo) {
+                body.innerHTML = `
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%;">
+                        <video controls autoplay src="${url}" style="max-width: 100%; max-height: 100%; border-radius:8px;"></video>
+                    </div>
+                `;
+            } else {
+                body.innerHTML = `<iframe src="${url}" style="width: 100%; height: 100%; border: none; background: white;"></iframe>`;
+            }
+        }
+
+        async function searchPdfText() {
+            const query = document.getElementById('pdfSearchInput').value.trim();
+            if (!query) return;
+            const resultsDiv = document.getElementById('pdfSearchResults');
+            resultsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 12px; padding: 5px;">Aranıyor...</div>';
+            resultsDiv.style.display = 'flex';
+            
+            try {
+                const res = await fetch(`/api/search_pdf_text?channel_id=${activeChannelId}&message_id=${activePreviewMessageId}&query=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                
+                resultsDiv.innerHTML = '';
+                if (!res.ok) {
+                    resultsDiv.innerHTML = `<div style="color: var(--accent-red); font-size: 12px; padding: 5px;">Hata: ${data.detail || 'Bilinmeyen hata'}</div>`;
+                    return;
+                }
+                
+                const matches = data.matches || [];
+                if (matches.length === 0) {
+                    resultsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 12px; padding: 5px;">Eşleşme bulunamadı.</div>';
+                    return;
+                }
+                
+                matches.forEach(m => {
+                    const row = document.createElement('div');
+                    row.className = 'pdf-match-row';
+                    row.innerHTML = `<strong>Sayfa ${m.page}:</strong> ${m.snippet}`;
+                    row.onclick = () => {
+                        const iframe = document.querySelector('#previewModalBody iframe');
+                        if (iframe) {
+                            const baseUrl = `/api/stream_preview?channel_id=${activeChannelId}&message_id=${activePreviewMessageId}`;
+                            iframe.src = `${baseUrl}#page=${m.page}`;
+                        }
+                    };
+                    resultsDiv.appendChild(row);
+                });
+            } catch (err) {
+                resultsDiv.innerHTML = `<div style="color: var(--accent-red); font-size: 12px; padding: 5px;">Hata: ${err}</div>`;
+            }
+        }
+
+        function changePlaybackSpeed(speed, btn) {
+            const audioEl = document.querySelector('#previewModalBody audio');
+            if (audioEl) audioEl.playbackRate = speed;
+            document.querySelectorAll('#audioControlsArea .speed-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+        }
+
+        async function cancelDownloadOnServer(taskId) {
+            try {
+                await fetch('/api/cancel_download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ task_id: taskId })
+                });
+            } catch (err) {
+                console.error("İptal hatası:", err);
+            }
+        }
+
+        async function clearCompletedDownloads() {
+            try {
+                await fetch('/api/clear_completed', { method: 'POST' });
+            } catch (err) {
+                console.error("Temizleme hatası:", err);
+            }
+        }
+
+        let lastActiveCount = 0;
+
+        function startPollingDownloads() {
+            if (downloadInterval) clearInterval(downloadInterval);
+            downloadInterval = setInterval(async () => {
+                try {
+                    const res = await fetch('/api/downloads');
+                    const data = await res.json();
+                    
+                    const downloads = data.downloads || {};
+                    const items = Object.values(downloads);
+                    
+                    const queueList = document.getElementById('downloadQueueList');
+                    
+                    if (items.length === 0) {
+                        document.getElementById('progressBar').style.width = `0%`;
+                        document.getElementById('progressPercent').innerText = `Boşta`;
+                        document.getElementById('progressDetail').innerText = `Aktif indirme işlemi yok.`;
+                        document.getElementById('progressDetail').style.color = 'var(--text-muted)';
+                        if (queueList) queueList.innerHTML = '<div style="padding: 10px; text-align: center; color: var(--text-muted); font-size:12px;">Kuyrukta dosya yok.</div>';
+                        lastActiveCount = 0;
+                        return;
+                    }
+                    
+                    const totalCount = items.length;
+                    const waitingCount = items.filter(i => i.status === 'waiting').length;
+                    const downloadingCount = items.filter(i => i.status === 'downloading').length;
+                    const completedCount = items.filter(i => i.status.startsWith('completed')).length;
+                    const failedCount = items.filter(i => i.status === 'failed').length;
+                    const cancelledCount = items.filter(i => i.status === 'cancelled').length;
+                    
+                    const activeCount = downloadingCount + waitingCount;
+                    const sidebarBadge = document.getElementById('sidebarQueueSummaryBadge');
+                    if (sidebarBadge) {
+                        if (activeCount > 0) {
+                            sidebarBadge.innerText = `${activeCount}`;
+                            sidebarBadge.style.display = 'inline-block';
+                        } else {
+                            sidebarBadge.style.display = 'none';
+                        }
+                    }
+
+                    if (lastActiveCount > 0 && activeCount === 0) {
+                        try {
+                            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                            const oscillator = audioCtx.createOscillator();
+                            const gainNode = audioCtx.createGain();
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioCtx.destination);
+                            oscillator.type = 'sine';
+                            oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                            oscillator.start();
+                            oscillator.stop(audioCtx.currentTime + 0.15);
+                        } catch (e) {
+                            console.log("Audio play error", e);
+                        }
+                    }
+                    lastActiveCount = activeCount;
+                    
+                    let totalProgress = 0;
+                    items.forEach(i => {
+                        totalProgress += i.progress || 0;
+                    });
+                    const overallPercent = (totalProgress / totalCount) * 100;
+                    
+                    document.getElementById('progressBar').style.width = `${overallPercent.toFixed(0)}%`;
+                    document.getElementById('progressPercent').innerText = `${overallPercent.toFixed(0)}%`;
+                    
+                    let queueHtml = '';
+                    items.forEach(dl => {
+                        const percent = (dl.progress * 100).toFixed(0);
+                        const progressStyle = `width: ${percent}%`;
+                        
+                        let badgeClass = 'badge-waiting';
+                        let badgeText = 'Bekliyor';
+                        if (dl.status === 'downloading') {
+                            badgeClass = 'badge-downloading';
+                            badgeText = 'İndiriliyor';
+                        } else if (dl.status.startsWith('completed')) {
+                            badgeClass = 'badge-completed';
+                            badgeText = 'Tamamlandı';
+                        } else if (dl.status === 'failed') {
+                            badgeClass = 'badge-failed';
+                            badgeText = 'Hata';
+                        } else if (dl.status === 'cancelled') {
+                            badgeClass = 'badge-cancelled';
+                            badgeText = 'İptal';
+                        }
+                        
+                        let actionBtn = '';
+                        if (dl.status === 'waiting' || dl.status === 'downloading') {
+                            actionBtn = `<button class="action-icon-btn destruct" onclick="event.stopPropagation(); cancelDownloadOnServer('${dl.id}')" title="İptal Et">✕</button>`;
+                        }
+                        
+                        queueHtml += `
+                            <div class="queue-item" id="queue_item_${dl.id}">
+                                <div class="queue-item-info">
+                                    <div class="queue-item-name" title="${dl.filename}">${dl.filename}</div>
+                                    <div class="queue-item-meta">
+                                        <span>Klasör: ${dl.target_folder}</span>
+                                        ${dl.error ? `<span style="color:var(--accent-red)">(${dl.error})</span>` : ''}
+                                    </div>
+                                </div>
+                                <div class="queue-item-progress-container">
+                                    <div class="queue-item-progress-bar" style="${progressStyle}"></div>
+                                </div>
+                                <div style="font-size: 11px; font-weight:600; width: 35px; text-align:right; color: var(--text-color);">${percent}%</div>
+                                <span class="queue-item-status-badge ${badgeClass}">${badgeText}</span>
+                                <div style="width: 20px; display:flex; justify-content:center;">
+                                    ${actionBtn}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    if (queueList) queueList.innerHTML = queueHtml;
+                    
+                    if (downloadingCount > 0) {
+                        const activeItem = items.find(i => i.status === 'downloading');
+                        const activeName = activeItem ? activeItem.filename : '';
+                        document.getElementById('progressDetail').innerText = `${activeName} indiriliyor... (${downloadingCount} aktif, ${waitingCount} bekleyen)`;
+                        document.getElementById('progressDetail').style.color = 'var(--accent-yellow)';
+                    } else if (waitingCount > 0) {
+                        document.getElementById('progressDetail').innerText = `İndirmeler başlamak üzere... (${waitingCount} bekleyen)`;
+                        document.getElementById('progressDetail').style.color = 'var(--accent-yellow)';
+                    } else {
+                        document.getElementById('progressDetail').innerText = `Tüm işlemler tamamlandı. (${completedCount} başarılı, ${failedCount} hatalı, ${cancelledCount} iptal)`;
+                        document.getElementById('progressDetail').style.color = 'var(--accent-green)';
+                    }
+                } catch (err) {
+                    console.error("İndirme durumu sorgulanamadı", err);
+                }
+            }, 1000);
+        }
+
+        function triggerBatchDownloadDirectly() {
+            const folder = document.getElementById('batchFolderSelect').value;
+            isBatchMode = true;
+            confirmDownload(folder);
+        }
+
+        let lastCheckedIndex = -1;
+
+        function handleRowClick(event, rowElement) {
+            const tagName = event.target.tagName;
+            if (tagName === 'BUTTON' || tagName === 'A' || tagName === 'TEXTAREA' || (tagName === 'INPUT' && event.target.type !== 'checkbox')) {
+                return;
+            }
+            
+            const checkbox = rowElement.querySelector('.media-select-check');
+            if (!checkbox) return;
+            
+            if (event.target !== checkbox) {
+                checkbox.checked = !checkbox.checked;
+            }
+            
+            const checkboxes = Array.from(document.querySelectorAll('.media-select-check'));
+            const index = checkboxes.indexOf(checkbox);
+            
+            if (event.shiftKey && lastCheckedIndex !== -1 && index !== -1) {
+                let start = Math.min(index, lastCheckedIndex);
+                let end = Math.max(index, lastCheckedIndex);
+                const targetState = checkboxes[lastCheckedIndex].checked;
+                for (let i = start; i <= end; i++) {
+                    checkboxes[i].checked = targetState;
+                    const chId = parseInt(checkboxes[i].dataset.channelId) || activeChannelId;
+                    const msgId = parseInt(checkboxes[i].dataset.msgId);
+                    const filename = checkboxes[i].dataset.filename;
+                    const key = `${chId}_${msgId}`;
+                    if (targetState) {
+                        globalSelectedItems[key] = { channel_id: chId, message_id: msgId, filename: filename };
+                    } else {
+                        delete globalSelectedItems[key];
+                    }
+                }
+            } else {
+                const chId = parseInt(checkbox.dataset.channelId) || activeChannelId;
+                const msgId = parseInt(checkbox.dataset.msgId);
+                const filename = checkbox.dataset.filename;
+                const key = `${chId}_${msgId}`;
+                if (checkbox.checked) {
+                    globalSelectedItems[key] = { channel_id: chId, message_id: msgId, filename: filename };
+                } else {
+                    delete globalSelectedItems[key];
+                }
+            }
+            lastCheckedIndex = index;
+            updateFloatingBatchBar();
+        }
+
+        async function triggerGlobalSearch() {
+            const query = document.getElementById('mainSearch').value.trim();
+            if (!query) {
+                alert("Lütfen aramak istediğiniz metni arama kutusuna yazın.");
+                return;
+            }
+            
+            const mediaList = document.getElementById('mediaList');
+            mediaList.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-muted);">Tüm sohbetlerde metin aranıyor, lütfen bekleyin...</div>';
+            setStatus('yellow', `"${query}" tüm sohbetlerde aranıyor...`);
+            
+            try {
+                const res = await fetch(`/api/global_search?q=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    mediaList.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--accent-red);">Hata: ${data.detail || 'Bilinmeyen hata'}</div>`;
+                    setStatus('red', 'Arama hatası.');
+                    return;
+                }
+                
+                const results = data.results || [];
+                const topTags = data.top_tags || [];
+                setStatus('green', `Arama tamamlandı. ${results.length} eşleşme bulundu.`);
+                activeTagFilters = [];
+                renderDynamicTagFilters(topTags);
+                renderGlobalSearchResults(results, query);
+            } catch (err) {
+                mediaList.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--accent-red);">Arama yapılamadı.</div>`;
+                setStatus('red', 'Arama hatası: ' + err);
+            }
+        }
+
+        function renderGlobalSearchResults(results, query) {
+            const list = document.getElementById('mediaList');
+            list.innerHTML = '';
+            
+            if (results.length === 0) {
+                list.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--text-muted);">Hiçbir sohbet veya belgede eşleşme bulunamadı.</div>';
+                return;
+            }
+            
+            const batchControls = document.createElement('div');
+            batchControls.style = 'display: flex; align-items: center; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;';
+            batchControls.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="masterSelectCheck" onchange="toggleSelectAll(this)" style="cursor: pointer;">
+                        <label for="masterSelectCheck" style="font-weight: 600; font-size: 13px; color: var(--text-muted); cursor: pointer;">Tümünü Seç (Arama Sonuçları)</label>
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="btn-small" onclick="invertSelection()" title="Seçimi Tersine Çevir">🔄 Ters Çevir</button>
+                        <button class="btn-small" onclick="selectOnlyPdfs()" title="Sadece PDF Dosyalarını Seç">📄 Sadece PDF'ler</button>
+                    </div>
+                </div>
+                <button class="btn" onclick="triggerSelectedBatchDownload()" style="width: auto; padding: 5px 15px; font-size: 12px; background: linear-gradient(to right, #4f46e5, #10b981); border: none;">Seçilenleri İndir</button>
+            `;
+            list.appendChild(batchControls);
+            
+            const hideMessages = true;
+            const header = document.createElement('div');
+            header.className = 'table-header';
+            header.innerHTML = `
+                <div style="padding-left: 30px;">Dosya Adı (Sohbet)</div>
+                <div style="text-align: center;">Boyut</div>
+                <div style="text-align: center;">Tarih</div>
+                <div style="text-align: center;">İşlemler</div>
+            `;
+            list.appendChild(header);
+            
+            results.forEach(item => {
+                if (!item.name) return;
+                const sizeMB = item.size / (1024 * 1024);
+                const sizeStr = sizeMB > 0.1 ? `${sizeMB.toFixed(2)} MB` : `${(item.size/1024).toFixed(1)} KB`;
+                
+                let tagsHtml = '';
+                if (item.tags && item.tags.length > 0) {
+                    item.tags.forEach(t => {
+                        const badgeStyle = getTagBadgeStyle(t);
+                        tagsHtml += `<span class="badge-tag" style="cursor: pointer; ${badgeStyle}" onclick="event.stopPropagation(); filterByTag('${t}')">${t}</span>`;
+                    });
+                }
+                if (item.ext && item.ext.toLowerCase() === '.pdf') {
+                    if (item.page_count) {
+                        tagsHtml += `<span class="badge-tag" style="background-color: #374151; color: #f3f4f6; font-weight: 600; cursor: default;">📄 ${item.page_count} Sayfa</span>`;
+                    } else {
+                        tagsHtml += `<span class="badge-tag pdf-page-badge" data-msg-id="${item.id}" data-channel-id="${item.chat_id}" style="background-color: #374151; color: #f3f4f6; font-weight: 600; cursor: help;">📄 Sayfa: ...</span>`;
+                    }
+                }
+                
+                let linkBtn = '';
+                if (item.links && item.links.length > 0) {
+                    linkBtn = `<button class="btn-preview" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.3);" onclick="event.stopPropagation(); window.open('${escapeJSString(item.links[0])}', '_blank')">🔗 Git</button>`;
+                }
+                
+                const row = document.createElement('div');
+                row.className = 'media-row';
+                row.style.position = 'relative';
+                row.onclick = (e) => handleRowClick(e, row);
+                const itemKey = `${item.chat_id}_${item.id}`;
+                const isChecked = globalSelectedItems[itemKey] ? 'checked' : '';
+                row.innerHTML = `
+                    <div style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);">
+                        <input type="checkbox" class="media-select-check" data-msg-id="${item.id}" data-filename="${escapeJSString(item.name)}" data-channel-id="${item.chat_id}" ${isChecked} style="cursor: pointer;">
+                    </div>
+                    <div class="file-name" title="${item.name}" style="padding-left: 30px; display: block; word-break: break-word; overflow-wrap: break-word;">
+                        <span style="background-color: var(--primary-color); color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; display: inline-block; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; margin-right: 6px;">${item.chat_name}</span>
+                        <span style="font-weight: 600; vertical-align: middle;">${item.name}</span>
+                        <span style="display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: middle;">${tagsHtml}</span>
+                    </div>
+                    <div style="text-align: center; color: var(--text-muted);">${sizeStr}</div>
+                    <div style="text-align: center; color: var(--text-muted);">${item.date}</div>
+                    <div class="action-btns">
+                        ${linkBtn}
+                        <button class="btn-preview" onclick="event.stopPropagation(); previewFile(${item.id}, '${escapeJSString(item.name)}', '${escapeJSString(item.type)}', ${item.chat_id})">Önizle</button>
+                        <button class="btn" onclick="event.stopPropagation(); openSingleDownloadModal(${item.id}, '${escapeJSString(item.name)}', ${item.chat_id})">İndir</button>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+            lazyLoadPdfPageCounts();
+            updateFloatingBatchBar();
+        }
+
+        function toggleTagFilter(btn, tagName) {
+            const idx = activeTagFilters.indexOf(tagName);
+            if (idx === -1) {
+                activeTagFilters.push(tagName);
+                btn.classList.add('active');
+                btn.style.backgroundColor = 'var(--primary-color)';
+                btn.style.color = 'white';
+            } else {
+                activeTagFilters.splice(idx, 1);
+                btn.classList.remove('active');
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = 'var(--text-muted)';
+            }
+            renderedCount = 100;
+            renderMedia();
+        }
+
+        function filterByTag(tagName) {
+            const btns = document.querySelectorAll('#tagFiltersGroup .sub-btn');
+            let foundBtn = null;
+            btns.forEach(btn => {
+                const btnText = btn.innerText.trim();
+                if (btnText.toUpperCase() === tagName.toUpperCase()) {
+                    foundBtn = btn;
+                }
+            });
+            
+            if (foundBtn) {
+                toggleTagFilter(foundBtn, tagName);
+            } else {
+                const idx = activeTagFilters.indexOf(tagName);
+                if (idx === -1) activeTagFilters.push(tagName);
+                else activeTagFilters.splice(idx, 1);
+                renderedCount = 100;
+                renderMedia();
+            }
+        }
+
+        async function openFolderOnServer(folder) {
+            try {
+                await fetch(`/api/open_folder?folder_name=${encodeURIComponent(folder)}`, { method: 'POST' });
+            } catch (err) {
+                alert("Klasör açma hatası: " + err);
+            }
+        }
+
+        async function loadFoldersFromServer() {
+            try {
+                const res = await fetch('/api/folders');
+                const data = await res.json();
+                foldersData = data.folders || [];
+                renderFoldersUI();
+            } catch (err) {
+                console.error("Klasörler yüklenemedi:", err);
+            }
+        }
+
+        function renderFoldersUI() {
+            const batchSelect = document.getElementById('batchFolderSelect');
+            if (batchSelect) {
+                batchSelect.innerHTML = foldersData.map(f => `<option value="${f}">${f}</option>`).join('');
+            }
+            
+            const openFolderSelect = document.getElementById('openFolderSelect');
+            if (openFolderSelect) {
+                openFolderSelect.innerHTML = `<option value="">Seçiniz...</option>` + foldersData.map(f => `<option value="${f}">${f}</option>`).join('');
+            }
+            
+            const dynamicButtons = document.getElementById('dynamicFolderButtons');
+            if (dynamicButtons) {
+                dynamicButtons.innerHTML = foldersData.map(f => `
+                    <button class="btn" onclick="confirmDownload('${escapeJSString(f)}')">${f} Klasörü</button>
+                `).join('');
+            }
+            
+            const settingsList = document.getElementById('settingsFolderList');
+            if (settingsList) {
+                if (foldersData.length === 0) {
+                    settingsList.innerHTML = '<span style="font-size:12px; color:var(--text-muted)">Klasör bulunmamaktadır.</span>';
+                } else {
+                    settingsList.innerHTML = foldersData.map(f => `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); border:1px solid var(--border-color); padding:4px 8px; border-radius:4px; font-size:12px; margin-bottom:4px;">
+                            <span style="flex-grow:1; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; text-align:left;">${f}</span>
+                            <button class="action-icon-btn destruct" onclick="deleteFolderFromServer('${escapeJSString(f)}')" style="padding:2px 6px; font-size:10px; font-weight:bold; background:transparent; border:none; cursor:pointer;">✕</button>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        async function addFolderFromSettings() {
+            const input = document.getElementById('newFolderSettingsInput');
+            const name = input.value.trim();
+            if (!name) return;
+            try {
+                const res = await fetch('/api/folders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                if (res.ok) {
+                    input.value = '';
+                    await loadFoldersFromServer();
+                }
+            } catch (err) {
+                console.error("Ekleme hatası:", err);
+            }
+        }
+
+        async function deleteFolderFromServer(name) {
+            if (!confirm(`"${name}" klasörünü silmek istediğinize emin misiniz?`)) return;
+            try {
+                const res = await fetch(`/api/folders?name=${encodeURIComponent(name)}`, { method: 'DELETE' });
+                if (res.ok) {
+                    await loadFoldersFromServer();
+                }
+            } catch (err) {
+                console.error("Silme hatası:", err);
+            }
+        }
+
+        async function confirmDownloadWithNewFolder() {
+            const input = document.getElementById('customFolderInput');
+            const customName = input.value.trim();
+            if (!customName) return;
+            try {
+                await fetch('/api/folders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: customName })
+                });
+                input.value = '';
+                await loadFoldersFromServer();
+                confirmDownload(customName);
+            } catch (err) {
+                console.error(err);
+                confirmDownload(customName);
+            }
+        }
+
+        async function clearCacheFromServer() {
+            if (!confirm("Önizleme dosyalarını ve önbelleği temizlemek istediğinize emin misiniz?")) return;
+            setStatus('yellow', 'Önbellek temizleniyor...');
+            try {
+                const res = await fetch('/api/clear_cache', { method: 'POST' });
+                if (res.ok) {
+                    setStatus('green', 'Önbellek başarıyla temizlendi.');
+                    alert('Önbellek ve önizleme dosyaları temizlendi.');
+                    if (activeChannelId) {
+                        loadMedia();
+                    }
+                } else {
+                    setStatus('red', 'Önbellek temizlenemedi.');
+                }
+            } catch (err) {
+                console.error(err);
+                setStatus('red', 'Temizleme hatası.');
+            }
+        }
+
+        async function triggerBatchZipDownloadDirectly() {
+            const selected = Object.values(globalSelectedItems).map(item => ({
+                channel_id: item.channel_id,
+                message_id: item.message_id,
+                filename: item.filename
+            }));
+
+            if (selected.length === 0) {
+                alert("Lütfen önce indirmek istediğiniz dosyaları seçin.");
+                return;
+            }
+
+            setStatus('yellow', 'ZIP dosyası hazırlanıyor, lütfen bekleyin...');
+            
+            try {
+                const res = await fetch('/api/download_zip', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        downloads: selected
+                    })
+                });
+
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'telegram_downloads.zip';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    setStatus('green', 'ZIP indirmesi tamamlandı.');
+                    clearAllSelection();
+                } else {
+                    const data = await res.json();
+                    setStatus('red', 'ZIP indirme hatası: ' + (data.detail || 'Bilinmeyen hata'));
+                    alert('ZIP indirme hatası: ' + (data.detail || 'Bilinmeyen hata'));
+                }
+            } catch (err) {
+                setStatus('red', 'ZIP indirme hatası: ' + err);
+                alert('ZIP indirme hatası: ' + err);
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Tam ekran modu etkinleştirilemedi: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.altKey && e.key === 'Enter') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainEl = document.querySelector('main');
+            if (mainEl) {
+                mainEl.addEventListener('dblclick', function(e) {
+                    const tagName = e.target.tagName;
+                    if (tagName === 'INPUT' || tagName === 'BUTTON' || tagName === 'A' || tagName === 'TEXTAREA' || tagName === 'SELECT' || e.target.closest('.action-btns') || e.target.closest('.channel-row') || e.target.closest('.tab-bar') || e.target.closest('.sub-filters')) {
+                        return;
+                    }
+                    toggleFullscreen();
+                });
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreenBtn');
+            if (btn) {
+                if (document.fullscreenElement) {
+                    btn.innerHTML = '📺 Küçült';
+                    btn.title = 'Normal Ekran (Alt + Enter)';
+                } else {
+                    btn.innerHTML = '📺 Tam Ekran';
+                    btn.title = 'Tam Ekran (Alt + Enter)';
+                }
+            }
+        });
+
+        async function lazyLoadPdfPageCounts() {
+            const badges = document.querySelectorAll('.pdf-page-badge');
+            if (badges.length === 0) return;
+            
+            for (let badge of badges) {
+                const msgId = badge.dataset.msgId;
+                const channelId = badge.dataset.channelId;
+                if (!msgId || !channelId) continue;
+                
+                try {
+                    const res = await fetch(`/api/pdf_page_count?channel_id=${channelId}&message_id=${msgId}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        badge.innerText = `📄 ${data.page_count} Sayfa`;
+                        badge.style.cursor = 'default';
+                        badge.removeAttribute('title');
+                        badge.classList.remove('pdf-page-badge');
+                    } else {
+                        badge.innerText = '📄 Sayfa: -';
+                    }
+                } catch (e) {
+                    badge.innerText = '📄 Sayfa: -';
+                }
+            }
+        }
+
+        function closeRightPanel() {
+            document.getElementById('channelInfoPanel').style.display = 'none';
+        }
+
+        async function toggleRightPanelMute() {
+            if (!activeChannelId) return;
+            const channel = channelsData.find(c => c.id === activeChannelId);
+            if (!channel) return;
+            await toggleMute(activeChannelId, !channel.muted, channel.name);
+            selectChannel(activeChannelId, channel.name);
+        }
+
+        async function toggleRightPanelLeave() {
+            if (!activeChannelId) return;
+            const channel = channelsData.find(c => c.id === activeChannelId);
+            if (!channel) return;
+            await leaveChannel(activeChannelId, channel.name, channel.type);
+        }
+    </script>
+</body>
+</html>

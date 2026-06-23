@@ -1,0 +1,36 @@
+# Telethon session and database files
+*.session
+*.session-journal
+session_name.*
+
+# Local credentials and configuration files
+kullanici.py
+kullanicilar.json
+pdf_sayfa_sayilari.json
+src/data/
+
+# Downloaded files and preview directories
+indirilenler/
+Temp_Preview/
+Temp_Preview*/
+
+# Python virtual environment and caching
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+ENV/
+
+# Editor and system files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.DS_Store
+Thumbs.db
