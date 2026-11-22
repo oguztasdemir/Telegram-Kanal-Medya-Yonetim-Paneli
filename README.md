@@ -1,5 +1,8 @@
 # Telegram Media Hub
 
+[![CI Tests](https://github.com/oguztasdemir/Telegram-Kanal-Medya-Yonetim-Paneli/actions/workflows/ci.yml/badge.svg)](https://github.com/oguztasdemir/Telegram-Kanal-Medya-Yonetim-Paneli/actions/workflows/ci.yml)
+
+
 Modern, hızlı ve kullanıcı dostu arayüze sahip yerel bir Telegram medya ve belge yönetim paneli. Bu araçla, üye olduğunuz tüm Telegram kanal, grup ve sohbetlerindeki PDF, görsel, ses ve video gibi dosyaları listeleyebilir, arayabilir, önizleyebilir ve toplu olarak indirebilirsiniz.
 
 ![Arayüz Önizlemesi](https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop)
@@ -61,3 +64,15 @@ Bu proje tamamen yerel bilgisayarınızda çalışır. Telegram API kimlik bilgi
 
 ## 📄 Lisans
 Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
+
+
+---
+
+## Yerel Testler
+
+Projenin temel çalışma ve sözdizimi doğrulama testlerini çalıştırmak için:
+
+```bash
+pip install pytest
+pytest tests -v
+```
